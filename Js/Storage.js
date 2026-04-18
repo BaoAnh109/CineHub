@@ -6,7 +6,8 @@ const STORAGE_KEYS = {
   bookingDraft: "cinehub_booking_draft",
   lastCustomer: "cinehub_last_customer",
   users: "cinehub_users",
-  currentUser: "cinehub_current_user"
+  currentUser: "cinehub_current_user",
+  theme: "cinehub_theme"
 };
 
 const DEFAULT_ADMIN_ACCOUNT = {
@@ -296,6 +297,14 @@ function saveCurrentUser(user) {
 
 function logoutUser() {
   localStorage.removeItem(STORAGE_KEYS.currentUser);
+}
+
+function getThemePreference() {
+  return readStorage(STORAGE_KEYS.theme, "dark");
+}
+
+function saveThemePreference(theme) {
+  writeStorage(STORAGE_KEYS.theme, theme);
 }
 
 function isAdmin(user = getCurrentUser()) {

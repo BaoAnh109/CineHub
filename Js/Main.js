@@ -41,6 +41,72 @@ function getCurrentPagePath() {
   return path || "Home.html";
 }
 
+function normalizeTheme(theme) {
+  return theme === "light" ? "light" : "dark";
+}
+
+function getActiveTheme() {
+  return normalizeTheme(getThemePreference());
+}
+
+function applyTheme(theme) {
+  const resolvedTheme = normalizeTheme(theme);
+
+  document.body.dataset.theme = resolvedTheme;
+  document.documentElement.style.colorScheme = resolvedTheme;
+  saveThemePreference(resolvedTheme);
+
+  return resolvedTheme;
+}
+
+function getThemeToggleLabel(theme) {
+  return theme === "light" ? "Chuyển sang chế độ tối" : "Chuyển sang chế độ sáng";
+}
+
+function createThemeToggleMarkup(theme) {
+  const nextTheme = theme === "light" ? "dark" : "light";
+  const icon = theme === "light" ? "bi-moon-stars-fill" : "bi-brightness-high-fill";
+  const label = theme === "light" ? "Tối" : "Sáng";
+
+  return `
+    <button
+      class="btn btn-theme-toggle btn-sm"
+      id="theme-toggle-btn"
+      type="button"
+      data-next-theme="${nextTheme}"
+      aria-label="${getThemeToggleLabel(theme)}"
+      title="${getThemeToggleLabel(theme)}"
+    >
+      <i class="bi ${icon}"></i>
+      <span>${label}</span>
+    </button>
+  `;
+}
+
+function syncThemeToggleButton(theme = getActiveTheme()) {
+  const button = document.getElementById("theme-toggle-btn");
+
+  if (!button) {
+    return;
+  }
+
+  const nextTheme = theme === "light" ? "dark" : "light";
+  const icon = theme === "light" ? "bi-moon-stars-fill" : "bi-brightness-high-fill";
+  const label = theme === "light" ? "Tối" : "Sáng";
+
+  button.dataset.nextTheme = nextTheme;
+  button.setAttribute("aria-label", getThemeToggleLabel(theme));
+  button.setAttribute("title", getThemeToggleLabel(theme));
+  button.innerHTML = `
+    <i class="bi ${icon}"></i>
+    <span>${label}</span>
+  `;
+}
+
+function initializeTheme() {
+  return applyTheme(getActiveTheme());
+}
+
 function sanitizeRedirectPath(path) {
   if (!path) {
     return "";
@@ -149,9 +215,11 @@ function renderSiteHeader() {
   const activePage = resolvePageKey();
   const currentUser = getCurrentUser();
   const ticketsLink = currentUser ? "Tickets.html" : buildAuthPageUrl("login", "Tickets.html");
+  const themeToggleHtml = createThemeToggleMarkup(getActiveTheme());
   const authActionHtml = currentUser
     ? `
       <div class="navbar-auth ms-lg-3">
+        ${themeToggleHtml}
         <span class="user-pill ${isAdmin(currentUser) ? "admin" : ""}">
           <i class="bi bi-person-circle"></i>
           ${escapeHtml(currentUser.fullName)}
@@ -161,6 +229,7 @@ function renderSiteHeader() {
     `
     : `
       <div class="navbar-auth ms-lg-3">
+        ${themeToggleHtml}
         <a class="btn btn-cine-outline btn-sm" href="${buildAuthPageUrl("login")}">Đăng nhập</a>
         <a class="btn btn-cine-primary btn-sm" href="${buildAuthPageUrl("register")}">Tạo tài khoản</a>
       </div>
@@ -169,20 +238,15 @@ function renderSiteHeader() {
   header.innerHTML = `
     <nav class="navbar navbar-expand-lg fixed-top cine-navbar">
       <div class="container">
-        <a href="Home.html">
+        <a href="Home.html" class="brand-link">
           <img
             class="navbar-brand mb-0 h1 me-0 brand-logo"
             src="../Assets/Images/Brand/Logo.png"
             alt="CineHub Logo"
             style="max-width: 80px;"
           />
-          <span style="font-weight: bold;
-                font-size: 1.5rem;
-                color: #17273f;
-                text-shadow: 0 0 1px rgba(90, 120, 180, 0.25);">CINE</span>
-          <span style="font-weight: larger;
-                color: #2d79d7;
-                font-size: 1.5rem;">HUB</span>
+          <span class="brand-word brand-word-cine">CINE</span>
+          <span class="brand-word brand-word-hub">HUB</span>
         </a>
         <button class="navbar-toggler btn btn-cine-outline px-3" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
           <i class="bi bi-list"></i>
@@ -200,7 +264,16 @@ function renderSiteHeader() {
     </nav>
   `;
 
+  const themeToggleButton = document.getElementById("theme-toggle-btn");
   const logoutButton = document.getElementById("logout-btn");
+
+  if (themeToggleButton) {
+    themeToggleButton.addEventListener("click", () => {
+      const nextTheme = themeToggleButton.dataset.nextTheme || "light";
+      const appliedTheme = applyTheme(nextTheme);
+      syncThemeToggleButton(appliedTheme);
+    });
+  }
 
   if (logoutButton) {
     logoutButton.addEventListener("click", () => {
@@ -358,6 +431,8 @@ async function initHomePage() {
   homeMovies.innerHTML = movies.slice(0, 6).map(createMovieCard).join("");
 }
 
+
+initializeTheme();
 
 
 document.addEventListener("DOMContentLoaded", async () => {

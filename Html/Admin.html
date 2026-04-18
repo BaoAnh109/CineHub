@@ -88,12 +88,38 @@
                         <input type="text" class="form-control" id="movie-cast" required />
                       </div>
                       <div class="col-12">
-                        <label class="form-label" for="movie-poster">Poster (đường dẫn hoặc URL)</label>
-                        <input type="text" class="form-control" id="movie-poster" placeholder="../Assets/Images/Posters/DefaultPoster.svg" />
+                        <label class="form-label" for="movie-poster-file">Poster</label>
+                        <input type="hidden" id="movie-poster" />
+                        <input type="file" class="d-none" id="movie-poster-file" accept="image/*" />
+                        <div class="image-dropzone" id="movie-poster-dropzone" tabindex="0" role="button" aria-label="Tải poster">
+                          <div class="image-dropzone-preview">
+                            <img id="movie-poster-preview" alt="Poster preview" />
+                          </div>
+                          <div class="image-dropzone-content">
+                            <strong>Kéo thả poster vào đây hoặc bấm để chọn ảnh</strong>
+                            <span id="movie-poster-meta">Nếu không tải lên, hệ thống sẽ dùng poster mặc định.</span>
+                          </div>
+                        </div>
+                        <div class="image-dropzone-actions">
+                          <button type="button" class="btn btn-sm btn-cine-outline" id="movie-poster-clear">Xóa poster</button>
+                        </div>
                       </div>
                       <div class="col-12">
-                        <label class="form-label" for="movie-banner">Banner (đường dẫn hoặc URL)</label>
-                        <input type="text" class="form-control" id="movie-banner" placeholder="../Assets/Images/Banners/DefaultBanner.svg" />
+                        <label class="form-label" for="movie-banner-file">Banner</label>
+                        <input type="hidden" id="movie-banner" />
+                        <input type="file" class="d-none" id="movie-banner-file" accept="image/*" />
+                        <div class="image-dropzone image-dropzone-banner" id="movie-banner-dropzone" tabindex="0" role="button" aria-label="Tải banner">
+                          <div class="image-dropzone-preview">
+                            <img id="movie-banner-preview" alt="Banner preview" />
+                          </div>
+                          <div class="image-dropzone-content">
+                            <strong>Kéo thả banner vào đây hoặc bấm để chọn ảnh</strong>
+                            <span id="movie-banner-meta">Nếu không tải lên, hệ thống sẽ dùng banner mặc định.</span>
+                          </div>
+                        </div>
+                        <div class="image-dropzone-actions">
+                          <button type="button" class="btn btn-sm btn-cine-outline" id="movie-banner-clear">Xóa banner</button>
+                        </div>
                       </div>
                       <div class="col-12">
                         <label class="form-label" for="movie-trailer">Trailer YouTube Embed</label>

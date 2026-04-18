@@ -29,12 +29,12 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="empty-state my-3">
               <i class="bi bi-ticket-perforated"></i>
               <h3 class="h5 mb-2">Tài khoản của bạn chưa có vé nào</h3>
-              <p class="mb-0">Hay đặt vé bằng tài khoản hiện tại để xem lịch sử mua vé của bạn.</p>
+              <p class="mb-0">Hãy đặt vé bằng tài khoản hiện tại để xem lịch sử mua vé của bạn.</p>
             </div>
           </td>
         </tr>
       `;
-      cardList.innerHTML = renderEmptyState("Tài khoản của bạn chưa có vé nào", "Hay quay lại trang phim để đặt vé bằng tài khoản hiện tại.");
+      cardList.innerHTML = renderEmptyState("Tài khoản của bạn chưa có vé nào", "Hãy quay lại trang phim để đặt vé bằng tài khoản hiện tại.");
       return;
     }
 

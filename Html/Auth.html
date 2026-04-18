@@ -26,9 +26,9 @@
     <main class="section-spacing page-offset">
       <div class="container">
         <div class="page-title-block">
-          <span class="section-subtitle">Tai khoan CineHub</span>
-          <h1>Dang nhap hoac tao tai khoan</h1>
-          <p>Trang nay dung de tao tai khoan user va dang nhap tai khoan admin. Admin sau khi dang nhap se su dung toan bo chuc nang quan tri hien co.</p>
+          <span class="section-subtitle">Tài khoản CineHub</span>
+          <h1>Đăng nhập hoặc tạo tài khoản</h1>
+          <p>Trang này dùng để tạo tài khoản người dùng và đăng nhập tài khoản admin. Admin sau khi đăng nhập sẽ sử dụng toàn bộ chức năng quản trị hiện có.</p>
         </div>
 
         <div class="row g-4">
@@ -39,12 +39,12 @@
               <ul class="nav nav-pills auth-nav mb-4" id="authTab" role="tablist">
                 <li class="nav-item" role="presentation">
                   <button class="nav-link active" id="login-tab" data-bs-toggle="pill" data-bs-target="#login-pane" type="button">
-                    Dang nhap
+                    Đăng nhập
                   </button>
                 </li>
                 <li class="nav-item" role="presentation">
                   <button class="nav-link" id="register-tab" data-bs-toggle="pill" data-bs-target="#register-pane" type="button">
-                    Tao tai khoan
+                    Tạo tài khoản
                   </button>
                 </li>
               </ul>
@@ -59,11 +59,11 @@
                         <input type="email" class="form-control" id="login-email" placeholder="ban@example.com" required />
                       </div>
                       <div class="col-12">
-                        <label for="login-password" class="form-label">Mat khau</label>
-                        <input type="password" class="form-control" id="login-password" placeholder="Nhap mat khau" required />
+                        <label for="login-password" class="form-label">Mật khẩu</label>
+                        <input type="password" class="form-control" id="login-password" placeholder="Nhập mật khẩu" required />
                       </div>
                     </div>
-                    <button type="submit" class="btn btn-cine-primary w-100 mt-4">Dang nhap ngay</button>
+                    <button type="submit" class="btn btn-cine-primary w-100 mt-4">Đăng nhập ngay</button>
                   </form>
                 </div>
 
@@ -72,7 +72,7 @@
                   <form id="register-form" novalidate>
                     <div class="row g-3">
                       <div class="col-12">
-                        <label for="register-name" class="form-label">Ho va ten</label>
+                        <label for="register-name" class="form-label">Họ và tên</label>
                         <input type="text" class="form-control" id="register-name" placeholder="Nguyen Van A" required />
                       </div>
                       <div class="col-12">
@@ -80,15 +80,15 @@
                         <input type="email" class="form-control" id="register-email" placeholder="ban@example.com" required />
                       </div>
                       <div class="col-md-6">
-                        <label for="register-password" class="form-label">Mat khau</label>
-                        <input type="password" class="form-control" id="register-password" placeholder="It nhat 6 ky tu" required />
+                        <label for="register-password" class="form-label">Mật khẩu</label>
+                        <input type="password" class="form-control" id="register-password" placeholder="Ít nhất 6 ký tự" required />
                       </div>
                       <div class="col-md-6">
-                        <label for="register-confirm-password" class="form-label">Nhap lai mat khau</label>
-                        <input type="password" class="form-control" id="register-confirm-password" placeholder="Nhap lai mat khau" required />
+                        <label for="register-confirm-password" class="form-label">Nhập lại mật khẩu</label>
+                        <input type="password" class="form-control" id="register-confirm-password" placeholder="Nhập lại mật khẩu" required />
                       </div>
                     </div>
-                    <button type="submit" class="btn btn-cine-primary w-100 mt-4">Tao tai khoan</button>
+                    <button type="submit" class="btn btn-cine-primary w-100 mt-4">Tạo tài khoản</button>
                   </form>
                 </div>
               </div>
@@ -97,21 +97,21 @@
 
           <div class="col-lg-5">
             <div class="auth-side-card mb-4">
-              <span class="section-subtitle">Tai khoan admin demo</span>
-              <h2 class="h3 mb-3">Dang nhap admin de vao trang quan tri</h2>
+              <span class="section-subtitle">Tài khoản admin demo</span>
+              <h2 class="h3 mb-3">Đăng nhập admin để vào trang quản trị</h2>
               <div class="demo-credential">
                 <span>Email</span>
                 <strong>admin@cinehub.local</strong>
               </div>
               <div class="demo-credential">
-                <span>Mat khau</span>
+                <span>Mật khẩu</span>
                 <strong>admin123</strong>
               </div>
-              <button id="fill-admin-btn" type="button" class="btn btn-cine-outline w-100 mt-3">Dien nhanh tai khoan admin</button>
+              <button id="fill-admin-btn" type="button" class="btn btn-cine-outline w-100 mt-3">Điền nhanh tài khoản admin</button>
             </div>
 
             <div class="auth-side-card">
-              <span class="section-subtitle">Trang thai hien tai</span>
+              <span class="section-subtitle">Trạng thái hiện tại</span>
               <div id="auth-session-box" class="auth-session-box"></div>
             </div>
           </div>

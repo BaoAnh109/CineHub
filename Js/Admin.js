@@ -1,3 +1,6 @@
+const DEFAULT_POSTER_PATH = "../Assets/Images/Posters/DefaultPoster.svg";
+const DEFAULT_BANNER_PATH = "../Assets/Images/Banners/DefaultBanner.svg";
+
 document.addEventListener("DOMContentLoaded", async () => {
   const currentUser = getCurrentUser();
 
@@ -14,9 +17,31 @@ document.addEventListener("DOMContentLoaded", async () => {
   const bookingsTable = document.getElementById("admin-bookings-table");
   const showtimeMovieSelect = document.getElementById("showtime-movie");
 
-  if (!movieForm || !showtimeForm) {
+  if (!movieForm || !showtimeForm || !moviesTable || !showtimesTable || !bookingsTable || !showtimeMovieSelect) {
     return;
   }
+
+  const posterField = setupImageDropzone({
+    hiddenInput: document.getElementById("movie-poster"),
+    fileInput: document.getElementById("movie-poster-file"),
+    dropzone: document.getElementById("movie-poster-dropzone"),
+    preview: document.getElementById("movie-poster-preview"),
+    meta: document.getElementById("movie-poster-meta"),
+    clearButton: document.getElementById("movie-poster-clear"),
+    fallbackPath: DEFAULT_POSTER_PATH,
+    emptyText: "Nếu không tải lên, hệ thống sẽ dùng poster mặc định."
+  });
+
+  const bannerField = setupImageDropzone({
+    hiddenInput: document.getElementById("movie-banner"),
+    fileInput: document.getElementById("movie-banner-file"),
+    dropzone: document.getElementById("movie-banner-dropzone"),
+    preview: document.getElementById("movie-banner-preview"),
+    meta: document.getElementById("movie-banner-meta"),
+    clearButton: document.getElementById("movie-banner-clear"),
+    fallbackPath: DEFAULT_BANNER_PATH,
+    emptyText: "Nếu không tải lên, hệ thống sẽ dùng banner mặc định."
+  });
 
   let movies = [];
   let showtimes = [];
@@ -49,9 +74,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   function renderMovieOptions() {
     showtimeMovieSelect.innerHTML = `
       <option value="">-- Chọn phim --</option>
-      ${movies
-        .map((movie) => `<option value="${escapeHtml(movie.id)}">${escapeHtml(movie.title)}</option>`)
-        .join("")}
+      ${movies.map((movie) => `<option value="${escapeHtml(movie.id)}">${escapeHtml(movie.title)}</option>`).join("")}
     `;
   }
 
@@ -139,8 +162,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       .join("");
   }
 
-  function handleMovieSubmit(event) {
+  async function handleMovieSubmit(event) {
     event.preventDefault();
+    await Promise.all([posterField.settle(), bannerField.settle()]);
 
     const movieId = document.getElementById("movie-id").value;
     const movieData = {
@@ -151,8 +175,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       releaseDate: document.getElementById("movie-release-date").value,
       director: document.getElementById("movie-director").value.trim(),
       cast: document.getElementById("movie-cast").value.trim(),
-      poster: document.getElementById("movie-poster").value.trim() || "../Assets/Images/Posters/DefaultPoster.svg",
-      banner: document.getElementById("movie-banner").value.trim() || "../Assets/Images/Banners/DefaultBanner.svg",
+      poster: posterField.getValue() || DEFAULT_POSTER_PATH,
+      banner: bannerField.getValue() || DEFAULT_BANNER_PATH,
       trailer: document.getElementById("movie-trailer").value.trim(),
       description: document.getElementById("movie-description").value.trim()
     };
@@ -228,8 +252,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       document.getElementById("movie-release-date").value = movie.releaseDate;
       document.getElementById("movie-director").value = movie.director;
       document.getElementById("movie-cast").value = movie.cast;
-      document.getElementById("movie-poster").value = movie.poster;
-      document.getElementById("movie-banner").value = movie.banner;
+      posterField.setValue(movie.poster);
+      bannerField.setValue(movie.banner);
       document.getElementById("movie-trailer").value = movie.trailer;
       document.getElementById("movie-description").value = movie.description;
       showAlert("admin-alert", `Đang chỉnh sửa phim ${movie.title}.`, "info");
@@ -298,6 +322,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   function resetMovieForm() {
     movieForm.reset();
     document.getElementById("movie-id").value = "";
+    posterField.reset();
+    bannerField.reset();
   }
 
   function resetShowtimeForm() {
@@ -305,3 +331,139 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("showtime-id").value = "";
   }
 });
+
+function setupImageDropzone({ hiddenInput, fileInput, dropzone, preview, meta, clearButton, fallbackPath, emptyText }) {
+  let pendingRead = Promise.resolve();
+
+  if (!hiddenInput || !fileInput || !dropzone || !preview || !meta || !clearButton) {
+    return {
+      getValue() {
+        return "";
+      },
+      reset() {},
+      setValue() {},
+      settle() {
+        return Promise.resolve();
+      }
+    };
+  }
+
+  function getSourceLabel(source) {
+    if (!source) {
+      return emptyText;
+    }
+
+    if (source.startsWith("data:image/")) {
+      return "Ảnh đã tải lên từ máy tính.";
+    }
+
+    const parts = source.split(/[\\/]/);
+    return `Đang dùng: ${parts[parts.length - 1]}`;
+  }
+
+  function syncPreview() {
+    const source = hiddenInput.value.trim();
+    preview.src = source || fallbackPath;
+    meta.textContent = getSourceLabel(source);
+    clearButton.disabled = !source;
+    dropzone.classList.toggle("image-dropzone-empty", !source);
+  }
+
+  async function readFile(file) {
+    if (!file) {
+      return;
+    }
+
+    if (!file.type.startsWith("image/")) {
+      showAlert("admin-alert", "Chỉ có thể tải tệp ảnh cho poster và banner.", "danger");
+      fileInput.value = "";
+      return;
+    }
+
+    pendingRead = new Promise((resolve) => {
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        hiddenInput.value = String(reader.result || "");
+        fileInput.value = "";
+        syncPreview();
+        resolve();
+      };
+
+      reader.onerror = () => {
+        showAlert("admin-alert", "Không thể đọc tệp ảnh vừa chọn.", "danger");
+        fileInput.value = "";
+        resolve();
+      };
+
+      reader.readAsDataURL(file);
+    });
+
+    await pendingRead;
+  }
+
+  function openPicker() {
+    fileInput.click();
+  }
+
+  dropzone.addEventListener("click", () => {
+    openPicker();
+  });
+
+  dropzone.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" && event.key !== " ") {
+      return;
+    }
+
+    event.preventDefault();
+    openPicker();
+  });
+
+  dropzone.addEventListener("dragover", (event) => {
+    event.preventDefault();
+    dropzone.classList.add("drag-over");
+  });
+
+  dropzone.addEventListener("dragleave", () => {
+    dropzone.classList.remove("drag-over");
+  });
+
+  dropzone.addEventListener("drop", async (event) => {
+    event.preventDefault();
+    dropzone.classList.remove("drag-over");
+    await readFile(event.dataTransfer?.files?.[0]);
+  });
+
+  fileInput.addEventListener("change", async () => {
+    await readFile(fileInput.files?.[0]);
+  });
+
+  clearButton.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    hiddenInput.value = "";
+    fileInput.value = "";
+    syncPreview();
+  });
+
+  syncPreview();
+
+  return {
+    getValue() {
+      return hiddenInput.value.trim();
+    },
+    reset() {
+      hiddenInput.value = "";
+      fileInput.value = "";
+      syncPreview();
+    },
+    setValue(value) {
+      hiddenInput.value = String(value || "").trim();
+      fileInput.value = "";
+      syncPreview();
+    },
+    settle() {
+      return pendingRead;
+    }
+  };
+}
