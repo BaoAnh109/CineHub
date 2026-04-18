@@ -70,7 +70,7 @@ function createThemeToggleMarkup(theme) {
 
   return `
     <button
-      class="btn btn-theme-toggle btn-sm"
+      class="btn btn-theme-toggle btn-sm rounded-pill"
       id="theme-toggle-btn"
       type="button"
       data-next-theme="${nextTheme}"
@@ -325,8 +325,11 @@ function renderSiteFooter() {
                 ${
                   isAdmin(currentUser)
                     ? '<a href="Admin.html" class="footer-link text-decoration-none">Quản lý rạp</a>'
-                    : `<a href="${buildAuthPageUrl("login")}" class="footer-link text-decoration-none">Đăng nhập</a>`
+                    : ``
                 }
+              </li>
+              <li class="mb-2">
+                <a href="Profile.html" class="footer-link text-decoration-none">Tài khoản</a>
               </li>
             </ul>
           </div>
