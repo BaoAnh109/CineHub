@@ -205,7 +205,11 @@ function saveUsers(users) {
 
 function ensureDefaultAdminAccount() {
   const users = getUsers();
-  const adminExists = users.some((user) => normalizeEmail(user.email) === normalizeEmail(DEFAULT_ADMIN_ACCOUNT.email));
+  const adminExists = users.some(
+    (user) =>
+      user.id === DEFAULT_ADMIN_ACCOUNT.id ||
+      normalizeEmail(user.email) === normalizeEmail(DEFAULT_ADMIN_ACCOUNT.email)
+  );
 
   if (!adminExists) {
     users.push({ ...DEFAULT_ADMIN_ACCOUNT });
@@ -218,6 +222,46 @@ function ensureDefaultAdminAccount() {
 function findUserByEmail(email) {
   const normalizedEmail = normalizeEmail(email);
   return getUsers().find((user) => normalizeEmail(user.email) === normalizedEmail) || null;
+}
+
+function findUserById(userId) {
+  return getUsers().find((user) => user.id === userId) || null;
+}
+
+function syncBookingsForUser(userId, { fullName, email }) {
+  const normalizedEmail = normalizeEmail(email);
+  const bookings = getBookings();
+  const updatedBookings = bookings.map((booking) => {
+    if (booking.ownerId === userId) {
+      return {
+        ...booking,
+        ownerName: fullName,
+        ownerEmail: normalizedEmail
+      };
+    }
+
+    return booking;
+  });
+
+  saveBookings(updatedBookings);
+}
+
+function syncLastCustomerInfo(previousEmail, nextUser) {
+  const lastCustomer = getLastCustomerInfo();
+
+  if (!lastCustomer) {
+    return;
+  }
+
+  if (normalizeEmail(lastCustomer.customerEmail) !== normalizeEmail(previousEmail)) {
+    return;
+  }
+
+  saveLastCustomerInfo({
+    ...lastCustomer,
+    customerName: nextUser.fullName,
+    customerEmail: nextUser.email
+  });
 }
 
 function registerUser({ fullName, email, password }) {
@@ -284,6 +328,111 @@ function authenticateUser(email, password) {
     success: true,
     message: "Đăng nhập thành công.",
     user: sessionUser
+  };
+}
+
+function updateUserProfile(userId, { fullName, email }) {
+  const trimmedName = String(fullName || "").trim();
+  const normalizedEmail = normalizeEmail(email);
+
+  if (!trimmedName || !normalizedEmail) {
+    return {
+      success: false,
+      message: "Vui lòng nhập đầy đủ họ tên và email."
+    };
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+    return {
+      success: false,
+      message: "Email không hợp lệ."
+    };
+  }
+
+  const users = getUsers();
+  const userIndex = users.findIndex((user) => user.id === userId);
+
+  if (userIndex < 0) {
+    return {
+      success: false,
+      message: "Không tìm thấy tài khoản cần cập nhật."
+    };
+  }
+
+  const currentUserRecord = users[userIndex];
+  const duplicatedUser = users.find(
+    (user) => user.id !== userId && normalizeEmail(user.email) === normalizedEmail
+  );
+
+  if (duplicatedUser) {
+    return {
+      success: false,
+      message: "Email này đã được sử dụng cho tài khoản khác."
+    };
+  }
+
+  const updatedUser = {
+    ...currentUserRecord,
+    fullName: trimmedName,
+    email: normalizedEmail
+  };
+
+  users[userIndex] = updatedUser;
+  saveUsers(users);
+  saveCurrentUser(toSessionUser(updatedUser));
+  syncBookingsForUser(userId, updatedUser);
+  syncLastCustomerInfo(currentUserRecord.email, updatedUser);
+
+  return {
+    success: true,
+    message: "Cập nhật thông tin tài khoản thành công.",
+    user: toSessionUser(updatedUser)
+  };
+}
+
+function changeUserPassword(userId, currentPassword, newPassword) {
+  const trimmedCurrentPassword = String(currentPassword || "").trim();
+  const trimmedNewPassword = String(newPassword || "").trim();
+  const users = getUsers();
+  const userIndex = users.findIndex((user) => user.id === userId);
+
+  if (userIndex < 0) {
+    return {
+      success: false,
+      message: "Không tìm thấy tài khoản cần đổi mật khẩu."
+    };
+  }
+
+  if (users[userIndex].password !== trimmedCurrentPassword) {
+    return {
+      success: false,
+      message: "Mật khẩu hiện tại không đúng."
+    };
+  }
+
+  if (trimmedNewPassword.length < 6) {
+    return {
+      success: false,
+      message: "Mật khẩu mới phải có ít nhất 6 ký tự."
+    };
+  }
+
+  if (trimmedCurrentPassword === trimmedNewPassword) {
+    return {
+      success: false,
+      message: "Mật khẩu mới phải khác mật khẩu hiện tại."
+    };
+  }
+
+  users[userIndex] = {
+    ...users[userIndex],
+    password: trimmedNewPassword
+  };
+  saveUsers(users);
+
+  return {
+    success: true,
+    message: "Đổi mật khẩu thành công."
   };
 }
 

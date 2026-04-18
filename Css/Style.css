@@ -876,6 +876,66 @@ img {
   padding: 1.2rem;
 }
 
+.profile-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(320px, 1fr);
+  gap: 1.25rem;
+  align-items: center;
+  padding: 1.7rem;
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  box-shadow: var(--shadow-xl);
+}
+
+.profile-hero h2 {
+  margin-bottom: 0.5rem;
+}
+
+.profile-hero p {
+  color: var(--text-muted);
+}
+
+.profile-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.profile-stat {
+  padding: 1rem 1.1rem;
+  border-radius: 20px;
+  background: var(--surface-soft);
+  border: 1px solid var(--border-soft);
+}
+
+.profile-stat span {
+  display: block;
+  color: var(--text-muted);
+  margin-bottom: 0.3rem;
+}
+
+.profile-stat strong {
+  color: var(--text-main);
+  font-size: 1.1rem;
+}
+
+.security-note {
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-start;
+  padding: 1rem 1.1rem;
+  border-radius: 18px;
+  background: var(--surface-soft);
+  color: var(--text-muted);
+}
+
+.security-note i {
+  color: var(--gold);
+  font-size: 1.1rem;
+  margin-top: 0.1rem;
+}
+
 @media (max-width: 991.98px) {
   .hero-section {
     padding-top: 6rem;
@@ -891,6 +951,14 @@ img {
 
   .navbar-auth {
     margin-top: 1rem;
+  }
+
+  .profile-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-stat-grid {
+    grid-template-columns: 1fr;
   }
 }
 

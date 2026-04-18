@@ -131,12 +131,6 @@ function buildAuthPageUrl(mode = "login", redirectPath = "") {
 }
 
 function getPostLoginDestination(user, redirectPath = "") {
-  const safeRedirect = sanitizeRedirectPath(redirectPath);
-
-  if (safeRedirect && (!safeRedirect.includes("Admin.html") || isAdmin(user))) {
-    return safeRedirect;
-  }
-
   return isAdmin(user) ? "Admin.html" : "Home.html";
 }
 
@@ -215,15 +209,16 @@ function renderSiteHeader() {
   const activePage = resolvePageKey();
   const currentUser = getCurrentUser();
   const ticketsLink = currentUser ? "Tickets.html" : buildAuthPageUrl("login", "Tickets.html");
+  const profileLink = currentUser ? "Profile.html" : buildAuthPageUrl("login", "Profile.html");
   const themeToggleHtml = createThemeToggleMarkup(getActiveTheme());
   const authActionHtml = currentUser
     ? `
       <div class="navbar-auth ms-lg-3">
         ${themeToggleHtml}
-        <span class="user-pill ${isAdmin(currentUser) ? "admin" : ""}">
+        <a class="user-pill ${isAdmin(currentUser) ? "admin" : ""}" href="${profileLink}">
           <i class="bi bi-person-circle"></i>
           ${escapeHtml(currentUser.fullName)}
-        </span>
+        </a>
         <button class="btn btn-cine-outline btn-sm" id="logout-btn" type="button">Đăng xuất</button>
       </div>
     `
