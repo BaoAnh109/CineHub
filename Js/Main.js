@@ -131,7 +131,7 @@ function buildAuthPageUrl(mode = "login", redirectPath = "") {
 }
 
 function getPostLoginDestination(user, redirectPath = "") {
-  return isAdmin(user) ? "Admin.html" : "Home.html";
+  return "Home.html";
 }
 
 function resolvePageKey() {
