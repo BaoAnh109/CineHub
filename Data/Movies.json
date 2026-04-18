@@ -1,0 +1,107 @@
+[
+  {
+    "id": "mv001",
+    "title": "Thám Tử Lừng Danh Conan: Ngôi Sao 5 Cánh 1 Triệu Đô",
+    "genre": "Hoạt hình, Hành động, Bí ẩn",
+    "duration": 109,
+    "releaseDate": "2026-04-18",
+    "director": "Chika Nagaoka",
+    "cast": "Minami Takayama, Koyama Rikiya, Tsuda Kenjiro,...",
+    "poster": "../Assets/Images/Posters/Conan.jpg",
+    "banner": "../Assets/Images/Banners/Conan.jpg",
+    "trailer": "https://www.youtube.com/embed/8ugaeA-nMTc",
+    "description": "Bộ phim tiếp tục theo chân Conan Edogawa trong một vụ án mới đầy bí ẩn, nơi những manh mối liên quan đến thanh kiếm Nhật, bí mật gia tộc và sự xuất hiện của siêu trộm Kaito Kid dần đan xen với nhau. Với nhịp phim nhanh, những màn suy luận đặc trưng cùng yếu tố hành động hấp dẫn, tác phẩm mang đến trải nghiệm quen thuộc nhưng vẫn lôi cuốn đối với khán giả yêu thích thương hiệu Conan."
+  },
+  {
+    "id": "mv002",
+    "title": "Diễm Ơi!!",
+    "genre": "Hành động, Hình sự",
+    "duration": 118,
+    "releaseDate": "2026-04-20",
+    "director": "Nguyễn Thành Đạt",
+    "cast": "Hoàng Long, Bảo Trâm, Việt Dũng",
+    "poster": "../Assets/Images/Posters/Do.jpg",
+    "banner": "../Assets/Images/Banners/Do.jpg",
+    "trailer": "https://www.youtube.com/embed/vKQi3bBA1y8",
+    "description": "Một chuyên gia giải mã vô tình bị cuốn vào đường dây buôn dữ liệu ngầm lớn nhất thành phố. Càng tiến gần sự thật, anh càng phải đối mặt với những lựa chọn nguy hiểm giữa công lý và sự sống còn."
+  },
+  {
+    "id": "mv003",
+    "title": "Nhà Bà Nữ",
+    "genre": "Hài hước, Chính kịch",
+    "duration": 105,
+    "releaseDate": "2026-04-15",
+    "director": "Trấn Thành",
+    "cast": "Lê Giang, Uyển Ân, Song Luân, Trấn Thành, Khả Như, Quỳnh Lý, Phương Lan, Dương Lâm, Ngọc Giàu, Việt Anh",
+    "poster": "../Assets/Images/Posters/Nbn.jpg",
+    "banner": "../Assets/Images/Banners/Nbn.jpg",
+    "trailer": "https://www.youtube.com/embed/tt2k8PGm-TI",
+    "description": " Nhà Bà Nữ là phim điện ảnh Việt Nam thuộc thể loại hài – chính kịch, xoay quanh những mâu thuẫn trong một gia đình nhiều thế hệ, nơi tình yêu thương luôn đi cùng áp lực, kiểm soát và các tổn thương tích tụ theo thời gian. Bộ phim khai thác đời sống gia đình gần gũi, nhiều cảm xúc, vừa có tiếng cười vừa có chiều sâu tâm lý."
+  },
+  {
+    "id": "mv004",
+    "title": "Running Man: Con Rối Tự Do",
+    "genre": "Hài, Kịch tính, Giải trí",
+    "duration": 124,
+    "releaseDate": "2026-04-22",
+    "director": "Trần Hải Nam",
+    "cast": "Quang Tuấn, Anh Tú Atus, Lan Ngọc, Diệu Nhi, Liên Bỉnh Phát, Quân A.P, Quang Trung, Lê Nhân",
+    "poster": "../Assets/Images/Posters/Hnmd.jpg",
+    "banner": "../Assets/Images/Banners/Hnmd.jpg",
+    "trailer": "https://www.youtube.com/embed/zSWdZVtXT7E",
+    "description": " Con Rối Tự Do là một game show thực tế mang màu sắc giải trí, kịch tính và đậm chất sân khấu, xoay quanh những nhân vật bị cuốn vào một hành trình vừa hỗn loạn vừa bí ẩn. Ẩn sau hình ảnh vui nhộn, hóa trang rực rỡ và không khí sôi động là câu chuyện về sự điều khiển, lựa chọn và khát vọng thoát khỏi những ràng buộc vô hình. Bộ phim đặt ra câu hỏi: nếu đã là con rối, liệu con người có thể tự mình giành lấy tự do hay không."
+  },
+  {
+    "id": "mv005",
+    "title": "Thiên Đường Máu",
+    "genre": "Hành động, Tâm lý",
+    "duration": 127,
+    "releaseDate": "2026-04-25",
+    "director": "Hoàng Tuấn Cường",
+    "cast": "Quang Tuấn, Hoài Lâm, Quách Ngọc Ngoan, Sỹ Toàn, Thanh Hương, Bích Ngọc, Lê Minh Thuấn, NSƯT Hạnh Thúy,...",
+    "poster": "../Assets/Images/Posters/Tdm.jpg",
+    "banner": "../Assets/Images/Banners/Tdm.jpg",
+    "trailer": "https://www.youtube.com/embed/3cxixDgHUYw",
+    "description": "Thiên Đường Máu là bộ phim Việt Nam mang màu sắc hành động, tâm lý và giật gân, khai thác câu chuyện về những con người bị cuốn vào vòng xoáy tội phạm và những lựa chọn sinh tồn khắc nghiệt. Tác phẩm tạo không khí căng thẳng, u tối và dồn dập, đồng thời phản ánh mặt tối của các đường dây lừa đảo, bạo lực và cái giá mà con người phải trả khi bị đẩy đến bước đường cùng."
+  },
+  {
+    "id": "mv006",
+    "title": "Trạng Quỳnh",
+    "genre": "Hài, Lãng mạn, Cổ trang",
+    "duration": 110,
+    "releaseDate": "2026-04-19",
+    "director": "Đức Thịnh",
+    "cast": " Trần Thành, Nhã Phương, Quốc Anh, Khả Như, Công Dương,...",
+    "poster": "../Assets/Images/Posters/Tq.jpg",
+    "banner": "../Assets/Images/Banners/Tq.jpg",
+    "trailer": "https://www.youtube.com/embed/s1Tj8g0Q7s8",
+    "description": "Trạng Quỳnh là bộ phim cổ trang pha màu sắc hài hước và lãng mạn, lấy cảm hứng từ hình tượng dân gian quen thuộc của người Việt. Phim xoay quanh hành trình của chàng Quỳnh thông minh."
+  },
+
+  {
+    "id": "mv007",
+    "title": "Sứ Sở Các Nguyên Tố",
+    "genre": "Hài, Hoạt hình, Phiêu lưu",
+    "duration": 98,
+    "releaseDate": "2026-04-27",
+    "director": "Peter Sohn",
+    "cast": "Leah Lewis, Mamoudou Athie, Ronnie del Carmen,...",
+    "poster": "../Assets/Images/Posters/Nt.jpg",
+    "banner": "../Assets/Images/Banners/Nt.jpg",
+    "trailer": "https://www.youtube.com/embed/JfVOs4VSpmA",
+    "description": " Sứ Sở Các Nguyên Tố là bộ phim hoạt hình giàu màu sắc và cảm xúc, kể về thế giới nơi các nguyên tố lửa, nước, đất và không khí cùng chung sống."
+  },
+  {
+    "id": "mv008",
+    "title": "Tiểu Yêu Quái Núi Lãng Lãng",
+    "genre": "Hoạt hình",
+    "duration": 121,
+    "releaseDate": "2026-04-29",
+    "director": "Shui Yu",
+    "cast": "Ziping Chen, Yang Lu, Wenliang Dong, Liu Cong, Lin Qiang",
+    "poster": "../Assets/Images/Posters/Tyqnll.jpg",
+    "banner": "../Assets/Images/Banners/Tyqnll.jpg",
+    "trailer": "https://www.youtube.com/embed/hA6hldpSTF8",
+    "description": "Tiểu Yêu Quái Núi Lãng Lãng là phim hoạt hình 2D Trung Quốc mang màu sắc phiêu lưu, hài hước và giàu tính ngụ ngôn."
+  }
+]

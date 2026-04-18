@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 900" role="img" aria-label="Default poster placeholder">
+  <defs>
+    <linearGradient id="posterBg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#10182b" />
+      <stop offset="100%" stop-color="#1f365f" />
+    </linearGradient>
+  </defs>
+  <rect width="600" height="900" fill="url(#posterBg)" rx="32" />
+  <rect x="48" y="48" width="504" height="804" rx="24" fill="none" stroke="#ffd369" stroke-width="4" stroke-dasharray="12 10" opacity="0.8" />
+  <circle cx="300" cy="310" r="92" fill="#ffd369" opacity="0.18" />
+  <path d="M246 292h108v132H246z" fill="#ffd369" opacity="0.85" />
+  <path d="M282 252h36v220h-36z" fill="#0f172a" opacity="0.92" />
+  <text x="300" y="620" text-anchor="middle" fill="#f8fafc" font-family="Arial, sans-serif" font-size="56" font-weight="700">CineHub</text>
+  <text x="300" y="690" text-anchor="middle" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="34">Poster Placeholder</text>
+</svg>

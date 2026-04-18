@@ -1,0 +1,44 @@
+.admin-tabs .nav-link {
+  border-radius: 999px;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0.85rem 1.2rem;
+  font-weight: 600;
+}
+
+.admin-tabs .nav-link.active {
+  background: linear-gradient(135deg, rgba(255, 77, 79, 0.18), rgba(255, 211, 105, 0.18));
+  color: var(--text-main);
+  border-color: rgba(255, 211, 105, 0.28);
+}
+
+.admin-panel {
+  padding: 1.6rem;
+  height: 100%;
+  border-radius: 26px;
+  background: rgba(16, 21, 39, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: var(--shadow-xl);
+}
+
+.admin-panel .table td,
+.admin-panel .table th {
+  white-space: nowrap;
+}
+
+.admin-panel textarea {
+  min-height: 120px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+@media (max-width: 991.98px) {
+  .admin-panel .table td,
+  .admin-panel .table th {
+    white-space: normal;
+  }
+}
