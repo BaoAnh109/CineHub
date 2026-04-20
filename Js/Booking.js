@@ -2,6 +2,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   const bookingForm = document.getElementById("booking-form");
   const bookingSummary = document.getElementById("booking-summary");
   const backToSeatButton = document.getElementById("back-to-seat-btn");
+  const paymentQrImage = document.getElementById("payment-qr-image");
+  const paymentBankNameElement = document.getElementById("payment-bank-name");
+  const paymentBankAccountElement = document.getElementById("payment-bank-account");
+  const paymentTransferContentElement = document.getElementById("payment-transfer-content");
+  const paymentTransferAmountElement = document.getElementById("payment-transfer-amount");
+  const copyTransferContentButton = document.getElementById("copy-transfer-content-btn");
+  const qrPaidCheck = document.getElementById("qr-paid-check");
 
   if (!bookingForm || !bookingSummary) {
     return;
@@ -13,12 +20,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   const currentUser = getCurrentUser();
 
   if (!currentUser) {
-    window.location.href = `${buildAuthPageUrl("login", `Booking.html?id=${encodeURIComponent(movieId || "")}&showtimeId=${encodeURIComponent(showtimeId || "")}`)}&reason=tickets`;
+    window.location.href = `${buildAuthPageUrl(
+      "login",
+      `Booking.html?id=${encodeURIComponent(movieId || "")}&showtimeId=${encodeURIComponent(showtimeId || "")}`
+    )}&reason=tickets`;
     return;
   }
 
   if (!draft || !Array.isArray(draft.selectedSeats) || draft.selectedSeats.length === 0) {
-    bookingSummary.innerHTML = renderEmptyState("Chưa có thông tin đặt vé", "Hãy quay lại bước chọn ghế trước khi xác nhận.");
+    bookingSummary.innerHTML = renderEmptyState(
+      "Chưa có thông tin đặt vé",
+      "Hãy quay lại bước chọn ghế trước khi thanh toán."
+    );
     bookingForm.classList.add("d-none");
     return;
   }
@@ -32,7 +45,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     const showtime = showtimes.find((item) => item.id === showtimeId);
 
     if (!movie || !showtime) {
-      bookingSummary.innerHTML = renderEmptyState("Thiếu dữ liệu phim hoặc suất chiếu", "Hãy quay lại chọn lịch chiếu.");
+      bookingSummary.innerHTML = renderEmptyState(
+        "Thiếu dữ liệu phim hoặc suất chiếu",
+        "Hãy quay lại chọn lịch chiếu."
+      );
       bookingForm.classList.add("d-none");
       return;
     }
@@ -41,11 +57,25 @@ document.addEventListener("DOMContentLoaded", async () => {
     const customerPhoneInput = document.getElementById("customer-phone");
     const customerEmailInput = document.getElementById("customer-email");
     const lastCustomer = getLastCustomerInfo();
+
     customerNameInput.value = currentUser?.fullName || lastCustomer?.customerName || "";
     customerPhoneInput.value = lastCustomer?.customerPhone || "";
     customerEmailInput.value = currentUser?.email || lastCustomer?.customerEmail || "";
 
     renderSummary(movie, showtime, draft);
+    const paymentContext = renderQrPayment(showtime, draft);
+
+    if (copyTransferContentButton) {
+      copyTransferContentButton.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(paymentContext.transferContent);
+          showAlert("booking-alert", "Đã sao chép nội dung chuyển khoản.", "success");
+        } catch (error) {
+          console.error(error);
+          showAlert("booking-alert", "Không thể sao chép. Hãy sao chép thủ công nội dung chuyển khoản.", "warning");
+        }
+      });
+    }
 
     bookingForm.addEventListener("submit", (event) => {
       event.preventDefault();
@@ -69,15 +99,25 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
       }
 
-      // Kiểm tra lại ghế đã đặt để tránh trường hợp người dùng mở nhiều tab cùng lúc.
+      if (qrPaidCheck && !qrPaidCheck.checked) {
+        showAlert("booking-alert", "Vui lòng xác nhận đã thanh toán QR trước khi hoàn tất đặt vé.", "danger");
+        return;
+      }
+
+      // Kiem tra lai ghe da dat de tranh truong hop nguoi dung mo nhieu tab cung luc.
       const currentBookedSeats = getBookedSeats(draft.showtimeKey);
       const invalidSeats = draft.selectedSeats.filter((seat) => currentBookedSeats.includes(seat));
 
       if (invalidSeats.length > 0) {
-        showAlert("booking-alert", `Ghế ${invalidSeats.join(", ")} đã có người đặt trước. Hãy chọn lại ghế khác.`, "danger");
+        showAlert(
+          "booking-alert",
+          `Ghế ${invalidSeats.join(", ")} đã có người đặt trước. Hãy chọn lại ghế khác.`,
+          "danger"
+        );
         return;
       }
 
+      const paidAt = new Date().toISOString();
       const booking = {
         ticketCode: generateTicketCode(),
         ownerId: currentUser.id,
@@ -94,8 +134,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         room: showtime.room,
         seats: [...draft.selectedSeats],
         totalPrice: showtime.price * draft.selectedSeats.length,
-        bookedAt: new Date().toISOString(),
-        showtimeKey: draft.showtimeKey
+        bookedAt: paidAt,
+        showtimeKey: draft.showtimeKey,
+        paymentMethod: "qr",
+        paymentStatus: "paid",
+        paymentTransferContent: paymentContext.transferContent,
+        paidAt
       };
 
       addBooking(booking);
@@ -103,7 +147,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       saveLastCustomerInfo({ customerName, customerPhone, customerEmail });
       clearBookingDraft();
 
-      showAlert("booking-alert", "Đặt vé thành công. Hệ thống sẽ chuyển bạn sang trang vé đã đặt.", "success");
+      showAlert("booking-alert", "Thanh toán thành công. Hệ thống đang chuyển bạn sang trang vé đã đặt.", "success");
 
       setTimeout(() => {
         window.location.href = `Tickets.html?ticketCode=${encodeURIComponent(booking.ticketCode)}`;
@@ -111,7 +155,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   } catch (error) {
     console.error(error);
-    bookingSummary.innerHTML = renderEmptyState("Không thể tải thông tin đặt vé", "Hãy kiểm tra dữ liệu và thử lại.");
+    bookingSummary.innerHTML = renderEmptyState(
+      "Không thể tải thông tin thanh toán",
+      "Hãy kiểm tra dữ liệu và thử lại."
+    );
     bookingForm.classList.add("d-none");
   }
 
@@ -132,4 +179,63 @@ document.addEventListener("DOMContentLoaded", async () => {
       </div>
     `;
   }
+
+  function renderQrPayment(showtime, currentDraft) {
+    const BANK_NAME = "MB Bank (Demo)";
+    const BANK_CODE = "MB";
+    const ACCOUNT_NUMBER = "1900123456789";
+    const ACCOUNT_NAME = "CINEHUB MOVIE";
+
+    const amount = showtime.price * currentDraft.selectedSeats.length;
+    const transferContent = buildTransferContent(showtime.id, currentDraft.selectedSeats);
+    const qrUrl = buildVietQrImageUrl({
+      bankCode: BANK_CODE,
+      accountNumber: ACCOUNT_NUMBER,
+      accountName: ACCOUNT_NAME,
+      amount,
+      transferContent
+    });
+
+    if (paymentQrImage) {
+      paymentQrImage.src = qrUrl;
+      paymentQrImage.alt = `Mã QR thanh toán ${formatCurrency(amount)}`;
+    }
+
+    if (paymentBankNameElement) {
+      paymentBankNameElement.textContent = BANK_NAME;
+    }
+
+    if (paymentBankAccountElement) {
+      paymentBankAccountElement.textContent = ACCOUNT_NUMBER;
+    }
+
+    if (paymentTransferContentElement) {
+      paymentTransferContentElement.textContent = transferContent;
+    }
+
+    if (paymentTransferAmountElement) {
+      paymentTransferAmountElement.textContent = formatCurrency(amount);
+    }
+
+    return {
+      amount,
+      transferContent
+    };
+  }
 });
+
+function buildTransferContent(showtimeId, seats) {
+  const sanitizedShowtimeId = String(showtimeId || "").replace(/\s+/g, "");
+  const seatCode = (Array.isArray(seats) ? seats : []).join("").replace(/\s+/g, "");
+  return `CINEHUB ${sanitizedShowtimeId} ${seatCode}`.trim();
+}
+
+function buildVietQrImageUrl({ bankCode, accountNumber, accountName, amount, transferContent }) {
+  const encodedInfo = encodeURIComponent(String(transferContent || ""));
+  const encodedAccountName = encodeURIComponent(String(accountName || ""));
+  const normalizedAmount = Number(amount || 0);
+
+  return `https://img.vietqr.io/image/${encodeURIComponent(bankCode)}-${encodeURIComponent(
+    accountNumber
+  )}-compact2.png?amount=${normalizedAmount}&addInfo=${encodedInfo}&accountName=${encodedAccountName}`;
+}

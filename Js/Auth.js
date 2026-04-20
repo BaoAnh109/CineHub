@@ -26,15 +26,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   if (reason === "admin") {
-    showAlert("auth-global-alert", "Ban can dang nhap bang tai khoan admin de vao trang quan tri.", "warning");
+    showAlert("auth-global-alert", "Bạn cần đăng nhập bằng tài khoản admin để vào trang quản trị.", "warning");
   }
 
   if (reason === "tickets") {
-    showAlert("auth-global-alert", "Ban can dang nhap de xem dung danh sach ve da mua cua tai khoan nay.", "warning");
+    showAlert("auth-global-alert", "Bạn cần đăng nhập để xem đúng danh sách vé đã mua của tài khoản này.", "warning");
   }
 
   if (reason === "profile") {
-    showAlert("auth-global-alert", "Ban can dang nhap de xem va chinh sua thong tin tai khoan.", "warning");
+    showAlert("auth-global-alert", "Bạn cần đăng nhập để xem và chỉnh sửa thông tin tài khoản.", "warning");
   }
 
   renderSessionBox();
@@ -76,12 +76,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     const confirmPassword = document.getElementById("register-confirm-password").value;
 
     if (password !== confirmPassword) {
-      showAlert("register-alert", "Mat khau nhap lai khong khop.", "danger");
+      showAlert("register-alert", "Mật khẩu nhập lại không khớp.", "danger");
       return;
     }
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      showAlert("register-alert", "Email khong hop le.", "danger");
+      showAlert("register-alert", "Email không hợp lệ.", "danger");
       return;
     }
 
@@ -92,7 +92,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    showAlert("register-alert", "Tao tai khoan thanh cong. He thong se dang nhap cho ban.", "success");
+    showAlert("register-alert", "Tạo tài khoản thành công. Hệ thống sẽ đăng nhập cho bạn.", "success");
     renderSessionBox();
     renderSiteHeader();
     renderSiteFooter();
@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!currentUser) {
       sessionBox.innerHTML = `
         <div class="auth-status-box">
-          <p class="mb-2">Ban chua dang nhap.</p>
+          <p class="mb-2">Bạn chưa đăng nhập.</p>
         </div>
       `;
       return;
@@ -117,7 +117,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     sessionBox.innerHTML = `
       <div class="auth-status-box">
         <div class="demo-credential">
-          <span>Ho ten</span>
+          <span>Họ tên</span>
           <strong>${escapeHtml(currentUser.fullName)}</strong>
         </div>
         <div class="demo-credential">
@@ -125,15 +125,15 @@ document.addEventListener("DOMContentLoaded", async () => {
           <strong>${escapeHtml(currentUser.email)}</strong>
         </div>
         <div class="demo-credential">
-          <span>Vai tro</span>
+          <span>Vai trò</span>
           <strong>${escapeHtml(currentUser.role)}</strong>
         </div>
         <div class="d-flex flex-wrap gap-2 mt-3">
-          <a class="btn btn-cine-outline btn-sm" href="Profile.html">Tai khoan</a>
+          <a class="btn btn-cine-outline btn-sm" href="Profile.html">Tài khoản</a>
           <a class="btn btn-cine-outline btn-sm" href="${isAdmin(currentUser) ? "Admin.html" : "Home.html"}">
-            ${isAdmin(currentUser) ? "Vao admin" : "Ve trang chu"}
+            ${isAdmin(currentUser) ? "Vào admin" : "Về trang chủ"}
           </a>
-          <button id="auth-logout-btn" type="button" class="btn btn-cine-primary btn-sm">Dang xuat</button>
+          <button id="auth-logout-btn" type="button" class="btn btn-cine-primary btn-sm">Đăng xuất</button>
         </div>
       </div>
     `;
@@ -143,7 +143,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       renderSessionBox();
       renderSiteHeader();
       renderSiteFooter();
-      showAlert("auth-global-alert", "Da dang xuat thanh cong.", "info");
+      showAlert("auth-global-alert", "Đã đăng xuất thành công.", "info");
     });
   }
 });

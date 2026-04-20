@@ -286,7 +286,7 @@ function registerUser({ fullName, email, password }) {
   if (findUserByEmail(normalizedEmail)) {
     return {
       success: false,
-      message: "Email này đã tồn tại. Hay dùng email khác."
+      message: "Email này đã tồn tại. Hãy dùng email khác."
     };
   }
 

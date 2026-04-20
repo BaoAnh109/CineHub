@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CineHub | Xác nhận đặt vé</title>
+    <title>CineHub | Thanh toán vé</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -28,14 +28,14 @@
         <div class="booking-stepper mb-4">
           <div class="step completed">1. Chọn lịch chiếu</div>
           <div class="step completed">2. Chọn ghế</div>
-          <div class="step active">3. Nhập thông tin</div>
+          <div class="step active">3. Thanh toán</div>
         </div>
 
         <div class="row g-4">
           <div class="col-lg-7">
             <div class="form-panel">
               <div id="booking-alert"></div>
-              <h1 class="h3 mb-4">Thông tin người đặt vé</h1>
+              <h1 class="h3 mb-4">Thông tin thanh toán</h1>
               <form id="booking-form" novalidate>
                 <div class="row g-3">
                   <div class="col-12">
@@ -52,9 +52,41 @@
                   </div>
                 </div>
 
+                <div class="payment-qr-card">
+                  <h2 class="h5 mb-3">Thanh toán bằng QR</h2>
+                  <div class="row g-3 align-items-center">
+                    <div class="col-md-5">
+                      <div class="payment-qr-image-wrap">
+                        <img id="payment-qr-image" class="payment-qr-image" src="" alt="Mã QR thanh toán" />
+                      </div>
+                      <button id="copy-transfer-content-btn" type="button" class="btn btn-cine-outline btn-sm w-100 mt-3">
+                        Sao chép nội dung chuyển khoản
+                      </button>
+                    </div>
+                    <div class="col-md-7">
+                      <div class="summary-list payment-meta">
+                        <div class="summary-item"><span>Ngân hàng</span><strong id="payment-bank-name"></strong></div>
+                        <div class="summary-item"><span>Số tài khoản</span><strong id="payment-bank-account"></strong></div>
+                        <div class="summary-item"><span>Nội dung CK</span><strong id="payment-transfer-content" class="transfer-content-value"></strong></div>
+                        <div class="summary-item"><span>Số tiền</span><strong id="payment-transfer-amount"></strong></div>
+                      </div>
+                      <p class="text-light-emphasis small mb-0 mt-3">
+                        Mở app ngân hàng và quét mã QR để thanh toán đơn vé.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-check mt-3">
+                    <input class="form-check-input" type="checkbox" value="1" id="qr-paid-check" />
+                    <label class="form-check-label" for="qr-paid-check">
+                      Tôi đã hoàn tất chuyển khoản qua mã QR.
+                    </label>
+                  </div>
+                </div>
+
                 <div class="mt-4 d-flex flex-wrap gap-3">
                   <a href="SeatSelection.html" id="back-to-seat-btn" class="btn btn-cine-outline">Quay lại chọn ghế</a>
-                  <button type="submit" class="btn btn-cine-primary">Xác nhận đặt vé</button>
+                  <button type="submit" class="btn btn-cine-primary">Xác nhận thanh toán</button>
                 </div>
               </form>
             </div>

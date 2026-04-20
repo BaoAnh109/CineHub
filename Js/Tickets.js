@@ -9,15 +9,21 @@ document.addEventListener("DOMContentLoaded", () => {
   const tableBody = document.getElementById("tickets-table-body");
   const cardList = document.getElementById("ticket-card-list");
   const highlightedTicketCode = getQueryParam("ticketCode");
+  const ticketDetailModalElement = document.getElementById("ticket-detail-modal");
+  const ticketDetailTitle = document.getElementById("ticket-detail-modal-title");
+  const ticketDetailSubtitle = document.getElementById("ticket-detail-modal-subtitle");
+  const ticketDetailInfo = document.getElementById("ticket-detail-info");
+  const ticketDetailQrImage = document.getElementById("ticket-detail-qr-image");
+  const ticketDetailModal = ticketDetailModalElement ? bootstrap.Modal.getOrCreateInstance(ticketDetailModalElement) : null;
 
-  if (!tableBody || !cardList) {
+  if (!tableBody || !cardList || !ticketDetailTitle || !ticketDetailSubtitle || !ticketDetailInfo || !ticketDetailQrImage) {
     return;
   }
 
   renderTickets();
 
-  tableBody.addEventListener("click", handleCancelTicket);
-  cardList.addEventListener("click", handleCancelTicket);
+  tableBody.addEventListener("click", handleTicketActions);
+  cardList.addEventListener("click", handleTicketActions);
 
   function renderTickets() {
     const bookings = getBookingsByUser(currentUser);
@@ -52,9 +58,14 @@ document.addEventListener("DOMContentLoaded", () => {
             <td>${escapeHtml(formatCurrency(booking.totalPrice))}</td>
             <td>${escapeHtml(formatDateTime(booking.bookedAt))}</td>
             <td>
-              <button class="btn btn-sm btn-outline-danger cancel-ticket-btn" data-ticket-code="${escapeHtml(booking.ticketCode)}">
-                Hủy vé
-              </button>
+              <div class="ticket-action-group">
+                <button class="btn btn-sm btn-cine-outline show-ticket-btn" data-ticket-code="${escapeHtml(booking.ticketCode)}">
+                  Mã vé
+                </button>
+                <button class="btn btn-sm btn-outline-danger cancel-ticket-btn" data-ticket-code="${escapeHtml(booking.ticketCode)}">
+                  Hủy vé
+                </button>
+              </div>
             </td>
           </tr>
         `;
@@ -73,7 +84,10 @@ document.addEventListener("DOMContentLoaded", () => {
                   <span class="section-subtitle mb-2">Mã vé</span>
                   <h3 class="h5 mb-0">${escapeHtml(booking.ticketCode)}</h3>
                 </div>
-                <button class="btn btn-sm btn-outline-danger cancel-ticket-btn" data-ticket-code="${escapeHtml(booking.ticketCode)}">Huy</button>
+                <div class="ticket-action-group">
+                  <button class="btn btn-sm btn-cine-outline show-ticket-btn" data-ticket-code="${escapeHtml(booking.ticketCode)}">Mã vé</button>
+                  <button class="btn btn-sm btn-outline-danger cancel-ticket-btn" data-ticket-code="${escapeHtml(booking.ticketCode)}">Hủy</button>
+                </div>
               </div>
               <div class="summary-list">
                 <div class="summary-item"><span>Khách hàng</span><strong>${escapeHtml(booking.customerName)}</strong></div>
@@ -90,14 +104,28 @@ document.addEventListener("DOMContentLoaded", () => {
       .join("");
   }
 
-  function handleCancelTicket(event) {
-    const button = event.target.closest(".cancel-ticket-btn");
+  function handleTicketActions(event) {
+    const showButton = event.target.closest(".show-ticket-btn");
+    const cancelButton = event.target.closest(".cancel-ticket-btn");
 
-    if (!button) {
+    if (showButton) {
+      const ticketCode = showButton.dataset.ticketCode;
+      const ticket = getBookingsByUser(currentUser).find((booking) => booking.ticketCode === ticketCode);
+
+      if (!ticket) {
+        showAlert("tickets-alert", "Không tìm thấy thông tin vé.", "danger");
+        return;
+      }
+
+      openTicketDetail(ticket);
       return;
     }
 
-    const ticketCode = button.dataset.ticketCode;
+    if (!cancelButton) {
+      return;
+    }
+
+    const ticketCode = cancelButton.dataset.ticketCode;
     const ticket = getBookingsByUser(currentUser).find((booking) => booking.ticketCode === ticketCode);
 
     if (!ticket) {
@@ -119,5 +147,36 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       showAlert("tickets-alert", "Không tìm thấy vé cần hủy.", "danger");
     }
+  }
+
+  function openTicketDetail(ticket) {
+    const qrPayload = buildTicketQrPayload(ticket);
+    ticketDetailQrImage.src = `https://quickchart.io/qr?size=280&text=${encodeURIComponent(qrPayload)}`;
+    ticketDetailQrImage.alt = `QR vé ${ticket.ticketCode}`;
+
+    ticketDetailTitle.textContent = `Mã vé: ${ticket.ticketCode}`;
+    ticketDetailSubtitle.textContent = ticket.movieTitle;
+    ticketDetailInfo.innerHTML = `
+      <div class="summary-item"><span>Khách hàng</span><strong>${escapeHtml(ticket.customerName)}</strong></div>
+      <div class="summary-item"><span>Suất chiếu</span><strong>${escapeHtml(formatDate(ticket.date))} - ${escapeHtml(ticket.time)}</strong></div>
+      <div class="summary-item"><span>Phòng</span><strong>${escapeHtml(ticket.room)}</strong></div>
+      <div class="summary-item"><span>Ghế</span><strong>${escapeHtml(ticket.seats.join(", "))}</strong></div>
+      <div class="summary-item"><span>Tổng tiền</span><strong>${escapeHtml(formatCurrency(ticket.totalPrice))}</strong></div>
+      <div class="summary-item"><span>Ngày đặt</span><strong>${escapeHtml(formatDateTime(ticket.bookedAt))}</strong></div>
+    `;
+
+    ticketDetailModal?.show();
+  }
+
+  function buildTicketQrPayload(ticket) {
+    return [
+      "CINEHUB",
+      ticket.ticketCode,
+      ticket.movieTitle,
+      `${ticket.date} ${ticket.time}`,
+      ticket.room,
+      ticket.seats.join("-"),
+      ticket.customerName
+    ].join("|");
   }
 });

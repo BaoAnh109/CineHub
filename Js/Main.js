@@ -364,7 +364,7 @@ function renderSiteFooter() {
         <div class="border-top mt-4 pt-3">
         <div class="row">
           <div class="col-12 text-center mb-2">
-            <small>© 2025 CineHub. All rights reserved</small>
+            <small>© 2025 CineHub. Bảo lưu mọi quyền.</small>
           </div>
         </div>
       </div>
@@ -415,12 +415,12 @@ async function initHomePage() {
 
         <button class="carousel-control-prev" type="button" data-bs-target="#carouselMovieHot" data-bs-slide="prev">
           <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Previous</span>
+          <span class="visually-hidden">Trước</span>
         </button>
 
         <button class="carousel-control-next" type="button" data-bs-target="#carouselMovieHot" data-bs-slide="next">
           <span class="carousel-control-next-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Next</span>
+          <span class="visually-hidden">Sau</span>
         </button>
       </div>
     </section>

@@ -56,6 +56,26 @@
       </div>
     </main>
 
+    <div class="modal fade" id="ticket-detail-modal" tabindex="-1" aria-labelledby="ticket-detail-modal-title" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content ticket-detail-modal-content">
+          <div class="modal-header border-secondary-subtle">
+            <div>
+              <h2 class="h5 mb-1" id="ticket-detail-modal-title">Mã vé</h2>
+              <p class="mb-0 small ticket-detail-subtitle" id="ticket-detail-modal-subtitle"></p>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+          </div>
+          <div class="modal-body">
+            <div class="ticket-qr-wrap mb-3">
+              <img id="ticket-detail-qr-image" class="ticket-qr-image" src="" alt="QR vé" />
+            </div>
+            <div id="ticket-detail-info" class="summary-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div id="site-footer"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
