@@ -28,7 +28,7 @@
         <div class="booking-stepper mb-4">
           <div class="step completed">1. Chọn lịch chiếu</div>
           <div class="step completed">2. Chọn ghế</div>
-          <div class="step active">3. Thanh toán</div>
+          <div class="step active">3. Chọn combo & thanh toán</div>
         </div>
 
         <div class="row g-4">
@@ -50,6 +50,14 @@
                     <label for="customer-email" class="form-label">Email</label>
                     <input type="email" class="form-control" id="customer-email" placeholder="ban@example.com" required />
                   </div>
+                </div>
+
+                <div class="combo-selection-card">
+                  <div class="d-flex flex-wrap justify-content-between gap-2 align-items-center mb-3">
+                    <h2 class="h5 mb-0">Combo bắp nước</h2>
+                    <a href="Combos.html" class="btn btn-cine-outline btn-sm">Xem trang combo</a>
+                  </div>
+                  <div id="booking-combo-list" class="combo-inline-list"></div>
                 </div>
 
                 <div class="payment-qr-card">

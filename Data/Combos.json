@@ -1,0 +1,62 @@
+[
+  {
+    "id": "cb_family_deluxe",
+    "name": "Combo Gia Đình Deluxe",
+    "description": "02 bắp caramel cỡ lớn, 04 nước ngọt 22oz, 01 khoai lắc phô mai.",
+    "price": 219000,
+    "isFeatured": true,
+    "badge": "Tiết kiệm 22%",
+    "serving": "3-4 người",
+    "icon": "bi-people-fill"
+  },
+  {
+    "id": "cb_couple_love",
+    "name": "Combo Cặp Đôi",
+    "description": "01 bắp mix vị cỡ vừa, 02 nước ngọt 22oz, 02 xúc xích nướng.",
+    "price": 139000,
+    "isFeatured": true,
+    "badge": "Bán chạy",
+    "serving": "2 người",
+    "icon": "bi-heart-fill"
+  },
+  {
+    "id": "cb_solo_chill",
+    "name": "Combo Xem Một Mình",
+    "description": "01 bắp mặn cỡ vừa và 01 nước ngọt 16oz.",
+    "price": 69000,
+    "isFeatured": false,
+    "badge": "",
+    "serving": "1 người",
+    "icon": "bi-cup-straw"
+  },
+  {
+    "id": "cb_kids_happy",
+    "name": "Combo Thiếu Nhi",
+    "description": "01 bắp bơ mini, 01 nước trái cây, 01 snack rong biển.",
+    "price": 59000,
+    "isFeatured": false,
+    "badge": "",
+    "serving": "1 người",
+    "icon": "bi-emoji-smile"
+  },
+  {
+    "id": "cb_party_night",
+    "name": "Combo Tiệc Đêm",
+    "description": "03 bắp phô mai lớn, 06 nước ngọt 22oz, 02 gà viên cay.",
+    "price": 329000,
+    "isFeatured": false,
+    "badge": "",
+    "serving": "5-6 người",
+    "icon": "bi-stars"
+  },
+  {
+    "id": "cb_snack_plus",
+    "name": "Combo Snack Plus",
+    "description": "01 bắp vị bơ, 01 nước ngọt 16oz, 01 snack khoai giòn.",
+    "price": 79000,
+    "isFeatured": false,
+    "badge": "",
+    "serving": "1 người",
+    "icon": "bi-bag-heart"
+  }
+]

@@ -1,7 +1,9 @@
 const STORAGE_KEYS = {
   movies: "cinehub_movies",
   showtimes: "cinehub_showtimes",
+  combos: "cinehub_combos",
   bookings: "cinehub_bookings",
+  comboOrders: "cinehub_combo_orders",
   bookedSeats: "cinehub_booked_seats",
   bookingDraft: "cinehub_booking_draft",
   lastCustomer: "cinehub_last_customer",
@@ -90,12 +92,28 @@ function saveShowtimes(showtimes) {
   writeStorage(STORAGE_KEYS.showtimes, showtimes);
 }
 
+async function getCombos() {
+  return initializeCollection(STORAGE_KEYS.combos, "../Data/Combos.json");
+}
+
+function saveCombos(combos) {
+  writeStorage(STORAGE_KEYS.combos, combos);
+}
+
 function getBookings() {
   return readStorage(STORAGE_KEYS.bookings, []);
 }
 
 function saveBookings(bookings) {
   writeStorage(STORAGE_KEYS.bookings, bookings);
+}
+
+function getComboOrders() {
+  return readStorage(STORAGE_KEYS.comboOrders, []);
+}
+
+function saveComboOrders(orders) {
+  writeStorage(STORAGE_KEYS.comboOrders, orders);
 }
 
 function getBookedSeatsMap() {
@@ -137,6 +155,12 @@ function addBooking(booking) {
   saveBookings(bookings);
 }
 
+function addComboOrder(order) {
+  const orders = getComboOrders();
+  orders.unshift(order);
+  saveComboOrders(orders);
+}
+
 function getBookingsByUser(user) {
   if (!user) {
     return [];
@@ -154,6 +178,26 @@ function getBookingsByUser(user) {
     }
 
     return normalizeEmail(booking.customerEmail) === normalizedSessionEmail;
+  });
+}
+
+function getComboOrdersByUser(user) {
+  if (!user) {
+    return [];
+  }
+
+  const normalizedSessionEmail = normalizeEmail(user.email);
+
+  return getComboOrders().filter((order) => {
+    if (order.ownerId) {
+      return order.ownerId === user.id;
+    }
+
+    if (order.ownerEmail) {
+      return normalizeEmail(order.ownerEmail) === normalizedSessionEmail;
+    }
+
+    return normalizeEmail(order.customerEmail) === normalizedSessionEmail;
   });
 }
 
@@ -244,6 +288,24 @@ function syncBookingsForUser(userId, { fullName, email }) {
   });
 
   saveBookings(updatedBookings);
+}
+
+function syncComboOrdersForUser(userId, { fullName, email }) {
+  const normalizedEmail = normalizeEmail(email);
+  const comboOrders = getComboOrders();
+  const updatedOrders = comboOrders.map((order) => {
+    if (order.ownerId === userId) {
+      return {
+        ...order,
+        ownerName: fullName,
+        ownerEmail: normalizedEmail
+      };
+    }
+
+    return order;
+  });
+
+  saveComboOrders(updatedOrders);
 }
 
 function syncLastCustomerInfo(previousEmail, nextUser) {
@@ -381,6 +443,7 @@ function updateUserProfile(userId, { fullName, email }) {
   saveUsers(users);
   saveCurrentUser(toSessionUser(updatedUser));
   syncBookingsForUser(userId, updatedUser);
+  syncComboOrdersForUser(userId, updatedUser);
   syncLastCustomerInfo(currentUserRecord.email, updatedUser);
 
   return {
@@ -470,7 +533,13 @@ function generateTicketCode() {
   return `VE${timePart}${randomPart}`;
 }
 
+function generateComboOrderCode() {
+  const timePart = Date.now().toString().slice(-6);
+  const randomPart = Math.floor(100 + Math.random() * 900);
+  return `CB${timePart}${randomPart}`;
+}
+
 async function syncBaseData() {
   ensureDefaultAdminAccount();
-  await Promise.all([getMovies(), getShowtimes()]);
+  await Promise.all([getMovies(), getShowtimes(), getCombos()]);
 }

@@ -1,6 +1,7 @@
-document.addEventListener("DOMContentLoaded", async () => {
+﻿document.addEventListener("DOMContentLoaded", async () => {
   const bookingForm = document.getElementById("booking-form");
   const bookingSummary = document.getElementById("booking-summary");
+  const bookingComboList = document.getElementById("booking-combo-list");
   const backToSeatButton = document.getElementById("back-to-seat-btn");
   const paymentQrImage = document.getElementById("payment-qr-image");
   const paymentBankNameElement = document.getElementById("payment-bank-name");
@@ -10,7 +11,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const copyTransferContentButton = document.getElementById("copy-transfer-content-btn");
   const qrPaidCheck = document.getElementById("qr-paid-check");
 
-  if (!bookingForm || !bookingSummary) {
+  if (!bookingForm || !bookingSummary || !bookingComboList) {
     return;
   }
 
@@ -40,7 +41,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   try {
     await window.appReady;
-    const [movies, showtimes] = await Promise.all([getMovies(), getShowtimes()]);
+    const [movies, showtimes, combos] = await Promise.all([getMovies(), getShowtimes(), getCombos()]);
     const movie = movies.find((item) => item.id === movieId);
     const showtime = showtimes.find((item) => item.id === showtimeId);
 
@@ -62,8 +63,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     customerPhoneInput.value = lastCustomer?.customerPhone || "";
     customerEmailInput.value = currentUser?.email || lastCustomer?.customerEmail || "";
 
-    renderSummary(movie, showtime, draft);
-    const paymentContext = renderQrPayment(showtime, draft);
+    const comboMap = new Map(combos.map((combo) => [combo.id, combo]));
+    const selectedCombos = normalizeSelectedCombos(draft.selectedCombos, combos);
+
+    renderComboSelector();
+    let paymentContext = refreshOrderView();
 
     if (copyTransferContentButton) {
       copyTransferContentButton.addEventListener("click", async () => {
@@ -76,6 +80,34 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
       });
     }
+
+    bookingComboList.addEventListener("click", (event) => {
+      const actionButton = event.target.closest("[data-combo-action]");
+
+      if (!actionButton) {
+        return;
+      }
+
+      const comboId = actionButton.dataset.comboId;
+      const action = actionButton.dataset.comboAction;
+      const combo = comboMap.get(comboId);
+
+      if (!combo) {
+        return;
+      }
+
+      const currentQuantity = Number(selectedCombos[comboId] || 0);
+      const nextQuantity = action === "increase" ? currentQuantity + 1 : Math.max(currentQuantity - 1, 0);
+
+      if (nextQuantity > 0) {
+        selectedCombos[comboId] = nextQuantity;
+      } else {
+        delete selectedCombos[comboId];
+      }
+
+      renderComboSelector();
+      paymentContext = refreshOrderView();
+    });
 
     bookingForm.addEventListener("submit", (event) => {
       event.preventDefault();
@@ -104,7 +136,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
       }
 
-      // Kiem tra lai ghe da dat de tranh truong hop nguoi dung mo nhieu tab cung luc.
       const currentBookedSeats = getBookedSeats(draft.showtimeKey);
       const invalidSeats = draft.selectedSeats.filter((seat) => currentBookedSeats.includes(seat));
 
@@ -117,7 +148,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
       }
 
+      const totals = calculateTotals(showtime, draft.selectedSeats, selectedCombos, comboMap);
+      const comboItems = buildComboItems(selectedCombos, comboMap);
       const paidAt = new Date().toISOString();
+
       const booking = {
         ticketCode: generateTicketCode(),
         ownerId: currentUser.id,
@@ -133,7 +167,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         time: showtime.time,
         room: showtime.room,
         seats: [...draft.selectedSeats],
-        totalPrice: showtime.price * draft.selectedSeats.length,
+        seatTotalPrice: totals.seatAmount,
+        combos: comboItems,
+        comboTotalPrice: totals.comboAmount,
+        totalPrice: totals.totalAmount,
         bookedAt: paidAt,
         showtimeKey: draft.showtimeKey,
         paymentMethod: "qr",
@@ -153,6 +190,53 @@ document.addEventListener("DOMContentLoaded", async () => {
         window.location.href = `Tickets.html?ticketCode=${encodeURIComponent(booking.ticketCode)}`;
       }, 1200);
     });
+
+    function renderComboSelector() {
+      if (combos.length === 0) {
+        bookingComboList.innerHTML = renderEmptyState("Chưa có combo", "Vui lòng quay lại sau để chọn thêm bắp nước.");
+        return;
+      }
+
+      bookingComboList.innerHTML = combos
+        .map((combo) => {
+          const quantity = Number(selectedCombos[combo.id] || 0);
+
+          return `
+            <article class="combo-inline-item ${combo.isFeatured ? "featured" : ""}">
+              <div class="combo-inline-head">
+                <div>
+                  <h3>${escapeHtml(combo.name)}</h3>
+                  <p class="mb-0">${escapeHtml(combo.description || "")}</p>
+                </div>
+                ${combo.badge ? `<span class="badge-soft">${escapeHtml(combo.badge)}</span>` : ""}
+              </div>
+              <div class="combo-inline-footer">
+                <strong>${escapeHtml(formatCurrency(combo.price))}</strong>
+                <div class="combo-qty-control">
+                  <button type="button" class="btn btn-cine-outline btn-sm" data-combo-action="decrease" data-combo-id="${escapeHtml(combo.id)}">-</button>
+                  <span>${escapeHtml(String(quantity))}</span>
+                  <button type="button" class="btn btn-cine-primary btn-sm" data-combo-action="increase" data-combo-id="${escapeHtml(combo.id)}">+</button>
+                </div>
+              </div>
+            </article>
+          `;
+        })
+        .join("");
+    }
+
+    function refreshOrderView() {
+      const totals = calculateTotals(showtime, draft.selectedSeats, selectedCombos, comboMap);
+      const comboItems = buildComboItems(selectedCombos, comboMap);
+
+      draft.selectedCombos = { ...selectedCombos };
+      draft.seatTotalAmount = totals.seatAmount;
+      draft.comboTotalAmount = totals.comboAmount;
+      draft.totalAmount = totals.totalAmount;
+      setBookingDraft(draft);
+
+      renderSummary(movie, showtime, draft.selectedSeats, comboItems, totals);
+      return renderQrPayment(totals.totalAmount, showtime, draft.selectedSeats, comboItems);
+    }
   } catch (error) {
     console.error(error);
     bookingSummary.innerHTML = renderEmptyState(
@@ -162,43 +246,67 @@ document.addEventListener("DOMContentLoaded", async () => {
     bookingForm.classList.add("d-none");
   }
 
-  function renderSummary(movie, showtime, currentDraft) {
+  function renderSummary(movie, showtime, selectedSeats, comboItems, totals) {
+    const comboSummaryHtml =
+      comboItems.length > 0
+        ? `
+          <hr class="border-secondary-subtle" />
+          <div>
+            <h3 class="h6 mb-2">Combo đã chọn</h3>
+            <div class="summary-list">
+              ${comboItems
+                .map(
+                  (item) => `
+                    <div class="summary-item">
+                      <span>${escapeHtml(item.name)} x${escapeHtml(String(item.quantity))}</span>
+                      <strong>${escapeHtml(formatCurrency(item.totalPrice))}</strong>
+                    </div>
+                  `
+                )
+                .join("")}
+            </div>
+          </div>
+        `
+        : "";
+
     bookingSummary.innerHTML = `
       <div class="summary-list">
         <div class="summary-item"><span>Phim</span><strong>${escapeHtml(movie.title)}</strong></div>
         <div class="summary-item"><span>Ngày chiếu</span><strong>${escapeHtml(formatDate(showtime.date))}</strong></div>
         <div class="summary-item"><span>Giờ chiếu</span><strong>${escapeHtml(showtime.time)}</strong></div>
         <div class="summary-item"><span>Phòng chiếu</span><strong>${escapeHtml(showtime.room)}</strong></div>
-        <div class="summary-item"><span>Ghế</span><strong>${escapeHtml(currentDraft.selectedSeats.join(", "))}</strong></div>
-        <div class="summary-item"><span>Giá mỗi ghế</span><strong>${escapeHtml(formatCurrency(showtime.price))}</strong></div>
+        <div class="summary-item"><span>Ghế</span><strong>${escapeHtml(selectedSeats.join(", "))}</strong></div>
+        <div class="summary-item"><span>Tiền vé</span><strong>${escapeHtml(formatCurrency(totals.seatAmount))}</strong></div>
+        <div class="summary-item"><span>Tiền combo</span><strong>${escapeHtml(formatCurrency(totals.comboAmount))}</strong></div>
       </div>
+      ${comboSummaryHtml}
       <hr class="border-secondary-subtle" />
       <div class="total-box">
         <span>Tổng cộng</span>
-        <strong>${escapeHtml(formatCurrency(showtime.price * currentDraft.selectedSeats.length))}</strong>
+        <strong>${escapeHtml(formatCurrency(totals.totalAmount))}</strong>
       </div>
     `;
   }
 
-  function renderQrPayment(showtime, currentDraft) {
+  function renderQrPayment(totalAmount, showtime, selectedSeats, comboItems) {
     const BANK_NAME = "MB Bank (Demo)";
     const BANK_CODE = "MB";
     const ACCOUNT_NUMBER = "1900123456789";
     const ACCOUNT_NAME = "CINEHUB MOVIE";
 
-    const amount = showtime.price * currentDraft.selectedSeats.length;
-    const transferContent = buildTransferContent(showtime.id, currentDraft.selectedSeats);
+    const comboCount = comboItems.reduce((total, item) => total + item.quantity, 0);
+    const transferContent = buildTransferContent(showtime.id, selectedSeats, comboCount);
     const qrUrl = buildVietQrImageUrl({
       bankCode: BANK_CODE,
       accountNumber: ACCOUNT_NUMBER,
       accountName: ACCOUNT_NAME,
-      amount,
+      amount: totalAmount,
       transferContent
     });
 
     if (paymentQrImage) {
       paymentQrImage.src = qrUrl;
-      paymentQrImage.alt = `Mã QR thanh toán ${formatCurrency(amount)}`;
+      paymentQrImage.alt = `Mã QR thanh toán ${formatCurrency(totalAmount)}`;
     }
 
     if (paymentBankNameElement) {
@@ -214,20 +322,72 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     if (paymentTransferAmountElement) {
-      paymentTransferAmountElement.textContent = formatCurrency(amount);
+      paymentTransferAmountElement.textContent = formatCurrency(totalAmount);
     }
 
     return {
-      amount,
+      amount: totalAmount,
       transferContent
     };
   }
 });
 
-function buildTransferContent(showtimeId, seats) {
+function normalizeSelectedCombos(rawSelection, combos) {
+  const comboIds = new Set(combos.map((combo) => combo.id));
+
+  if (!rawSelection || typeof rawSelection !== "object") {
+    return {};
+  }
+
+  return Object.entries(rawSelection).reduce((result, [comboId, quantity]) => {
+    const parsedQuantity = Math.max(Number(quantity || 0), 0);
+
+    if (comboIds.has(comboId) && parsedQuantity > 0) {
+      result[comboId] = parsedQuantity;
+    }
+
+    return result;
+  }, {});
+}
+
+function buildComboItems(selectedCombos, comboMap) {
+  return Object.entries(selectedCombos)
+    .map(([comboId, quantity]) => {
+      const combo = comboMap.get(comboId);
+      const normalizedQuantity = Number(quantity || 0);
+
+      if (!combo || normalizedQuantity <= 0) {
+        return null;
+      }
+
+      return {
+        id: combo.id,
+        name: combo.name,
+        quantity: normalizedQuantity,
+        unitPrice: Number(combo.price || 0),
+        totalPrice: Number(combo.price || 0) * normalizedQuantity
+      };
+    })
+    .filter(Boolean);
+}
+
+function calculateTotals(showtime, selectedSeats, selectedCombos, comboMap) {
+  const seatAmount = Number(showtime.price || 0) * selectedSeats.length;
+  const comboAmount = buildComboItems(selectedCombos, comboMap).reduce((total, item) => total + item.totalPrice, 0);
+
+  return {
+    seatAmount,
+    comboAmount,
+    totalAmount: seatAmount + comboAmount
+  };
+}
+
+function buildTransferContent(showtimeId, seats, comboCount) {
   const sanitizedShowtimeId = String(showtimeId || "").replace(/\s+/g, "");
   const seatCode = (Array.isArray(seats) ? seats : []).join("").replace(/\s+/g, "");
-  return `CINEHUB ${sanitizedShowtimeId} ${seatCode}`.trim();
+  const normalizedComboCount = Number(comboCount || 0);
+  const comboPart = normalizedComboCount > 0 ? ` C${normalizedComboCount}` : "";
+  return `CINEHUB ${sanitizedShowtimeId} ${seatCode}${comboPart}`.trim();
 }
 
 function buildVietQrImageUrl({ bankCode, accountNumber, accountName, amount, transferContent }) {

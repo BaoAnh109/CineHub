@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const selectedShowtime = document.getElementById("selected-showtime");
   const seatMap = document.getElementById("seat-map");
   const selectedSeatsContainer = document.getElementById("selected-seats");
+  const selectedComboNote = document.getElementById("selected-combo-note");
   const totalPriceElement = document.getElementById("seat-total-price");
   const confirmButton = document.getElementById("confirm-seat-btn");
 
@@ -35,6 +36,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       storedDraft && storedDraft.showtimeId === showtime.id && Array.isArray(storedDraft.selectedSeats)
         ? [...storedDraft.selectedSeats]
         : [];
+    const selectedCombos =
+      storedDraft && storedDraft.showtimeId === showtime.id && storedDraft.selectedCombos
+        ? { ...storedDraft.selectedCombos }
+        : {};
 
     seatSummary.innerHTML = `
       <div class="d-flex flex-column flex-md-row gap-4 align-items-md-center">
@@ -110,6 +115,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       totalPriceElement.textContent = formatCurrency(showtime.price * selectedSeats.length);
       confirmButton.disabled = selectedSeats.length === 0;
+
+      if (selectedComboNote) {
+        const comboCount = Object.values(selectedCombos).reduce(
+          (total, quantity) => total + Number(quantity || 0),
+          0
+        );
+        selectedComboNote.textContent =
+          comboCount > 0
+            ? `Bạn đã chọn ${comboCount} combo bắp nước. Có thể chỉnh lại ở bước thanh toán.`
+            : "Bạn có thể thêm combo bắp nước ở bước thanh toán.";
+      }
     }
 
     confirmButton.addEventListener("click", () => {
@@ -123,6 +139,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         price: showtime.price,
         showtimeKey,
         selectedSeats,
+        selectedCombos,
         totalAmount: showtime.price * selectedSeats.length
       });
 

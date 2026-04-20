@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CineHub | Vé đã đặt</title>
+    <title>CineHub | Vé và combo đã đặt</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -27,32 +27,67 @@
       <div class="container">
         <div class="page-title-block">
           <span class="section-subtitle">Lịch sử đặt vé</span>
-          <h1>Danh sách vé đã đặt</h1>
+          <h1>Vé đã đặt và combo đã đặt</h1>
         </div>
 
         <div id="tickets-alert"></div>
 
-        <div class="table-panel d-none d-lg-block">
-          <div class="table-responsive">
-            <table class="table table-dark align-middle" id="tickets-table">
-              <thead>
-                <tr>
-                  <th>Mã vé</th>
-                  <th>Khách hàng</th>
-                  <th>Phim</th>
-                  <th>Suất chiếu</th>
-                  <th>Ghế</th>
-                  <th>Tổng tiền</th>
-                  <th>Ngày đặt</th>
-                  <th>Thao tác</th>
-                </tr>
-              </thead>
-              <tbody id="tickets-table-body"></tbody>
-            </table>
+        <section class="mb-5">
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <i class="bi bi-ticket-perforated text-warning"></i>
+            <h2 class="h4 mb-0">Vé đã đặt</h2>
           </div>
-        </div>
 
-        <div class="row g-4 d-lg-none" id="ticket-card-list"></div>
+          <div class="table-panel d-none d-lg-block">
+            <div class="table-responsive">
+              <table class="table table-dark align-middle" id="tickets-table">
+                <thead>
+                  <tr>
+                    <th>Mã vé</th>
+                    <th>Khách hàng</th>
+                    <th>Phim</th>
+                    <th>Suất chiếu</th>
+                    <th>Ghế</th>
+                    <th>Combo</th>
+                    <th>Tổng tiền</th>
+                    <th>Ngày đặt</th>
+                    <th>Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody id="tickets-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="row g-4 d-lg-none" id="ticket-card-list"></div>
+        </section>
+
+        <section>
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <i class="bi bi-cup-straw text-warning"></i>
+            <h2 class="h4 mb-0">Combo đã đặt riêng</h2>
+          </div>
+
+          <div class="table-panel d-none d-lg-block">
+            <div class="table-responsive">
+              <table class="table table-dark align-middle" id="combo-orders-table">
+                <thead>
+                  <tr>
+                    <th>Mã combo</th>
+                    <th>Khách hàng</th>
+                    <th>Chi tiết combo</th>
+                    <th>Tổng tiền</th>
+                    <th>Ngày đặt</th>
+                    <th>Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody id="combo-orders-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="row g-4 d-lg-none" id="combo-order-card-list"></div>
+        </section>
       </div>
     </main>
 
