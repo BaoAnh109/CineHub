@@ -1,6 +1,13 @@
 ﻿const COMBO_CART_KEY = "cinehub_combo_cart";
 
 document.addEventListener("DOMContentLoaded", async () => {
+  const currentUser = getCurrentUser();
+
+  if (!currentUser) {
+    window.location.href = `${buildAuthPageUrl("login", "Combos.html")}&reason=combo`;
+    return;
+  }
+
   const featuredComboList = document.getElementById("featured-combo-list");
   const otherComboList = document.getElementById("other-combo-list");
   const comboCartSummary = document.getElementById("combo-cart-summary");
@@ -34,7 +41,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const comboMap = new Map(combos.map((combo) => [combo.id, combo]));
     const featuredCombos = combos.filter((combo) => combo.isFeatured);
     const otherCombos = combos.filter((combo) => !combo.isFeatured);
-    const currentUser = getCurrentUser();
     const lastCustomer = getLastCustomerInfo();
 
     customerNameInput.value = currentUser?.fullName || lastCustomer?.customerName || "";

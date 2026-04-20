@@ -107,7 +107,7 @@ body[data-theme="light"] {
 
 body {
   margin: 0;
-  font-family: "Roboto", sans-serif;
+  font-family: "Poppins", "Be Vietnam Pro", "Segoe UI", Tahoma, sans-serif;
   color: var(--text-main);
   background: var(--page-bg);
   min-height: 100vh;
@@ -245,7 +245,7 @@ img {
 .page-title-block h1,
 .hero-content h1,
 .movie-detail-banner h1 {
-  font-family: "Poppins", "Roboto", sans-serif;
+  font-family: "Poppins", "Be Vietnam Pro", "Segoe UI", Tahoma, sans-serif;
   font-weight: 700;
   letter-spacing: 0.4px;
 }

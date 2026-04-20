@@ -4,6 +4,7 @@ const STORAGE_KEYS = {
   combos: "cinehub_combos",
   bookings: "cinehub_bookings",
   comboOrders: "cinehub_combo_orders",
+  supportRequests: "cinehub_support_requests",
   bookedSeats: "cinehub_booked_seats",
   bookingDraft: "cinehub_booking_draft",
   lastCustomer: "cinehub_last_customer",
@@ -116,6 +117,14 @@ function saveComboOrders(orders) {
   writeStorage(STORAGE_KEYS.comboOrders, orders);
 }
 
+function getSupportRequests() {
+  return readStorage(STORAGE_KEYS.supportRequests, []);
+}
+
+function saveSupportRequests(requests) {
+  writeStorage(STORAGE_KEYS.supportRequests, requests);
+}
+
 function getBookedSeatsMap() {
   return readStorage(STORAGE_KEYS.bookedSeats, {});
 }
@@ -161,6 +170,12 @@ function addComboOrder(order) {
   saveComboOrders(orders);
 }
 
+function addSupportRequest(request) {
+  const requests = getSupportRequests();
+  requests.unshift(request);
+  saveSupportRequests(requests);
+}
+
 function getBookingsByUser(user) {
   if (!user) {
     return [];
@@ -199,6 +214,51 @@ function getComboOrdersByUser(user) {
 
     return normalizeEmail(order.customerEmail) === normalizedSessionEmail;
   });
+}
+
+function getSupportRequestsByUser(user) {
+  if (!user) {
+    return [];
+  }
+
+  const normalizedSessionEmail = normalizeEmail(user.email);
+
+  return getSupportRequests().filter((request) => {
+    if (request.ownerId) {
+      return request.ownerId === user.id;
+    }
+
+    if (request.ownerEmail) {
+      return normalizeEmail(request.ownerEmail) === normalizedSessionEmail;
+    }
+
+    return normalizeEmail(request.email) === normalizedSessionEmail;
+  });
+}
+
+function updateSupportRequestStatus(requestCode, status, resolvedBy = null) {
+  const requests = getSupportRequests();
+  const requestIndex = requests.findIndex((request) => request.requestCode === requestCode);
+
+  if (requestIndex < 0) {
+    return false;
+  }
+
+  requests[requestIndex] = {
+    ...requests[requestIndex],
+    status,
+    resolvedAt: new Date().toISOString(),
+    resolvedBy: resolvedBy
+      ? {
+          id: resolvedBy.id || null,
+          fullName: resolvedBy.fullName || "",
+          email: resolvedBy.email || ""
+        }
+      : null
+  };
+
+  saveSupportRequests(requests);
+  return true;
 }
 
 function removeBooking(ticketCode) {
@@ -306,6 +366,25 @@ function syncComboOrdersForUser(userId, { fullName, email }) {
   });
 
   saveComboOrders(updatedOrders);
+}
+
+function syncSupportRequestsForUser(userId, { fullName, email }) {
+  const normalizedEmail = normalizeEmail(email);
+  const supportRequests = getSupportRequests();
+  const updatedRequests = supportRequests.map((request) => {
+    if (request.ownerId === userId) {
+      return {
+        ...request,
+        fullName,
+        email: normalizedEmail,
+        ownerEmail: normalizedEmail
+      };
+    }
+
+    return request;
+  });
+
+  saveSupportRequests(updatedRequests);
 }
 
 function syncLastCustomerInfo(previousEmail, nextUser) {
@@ -444,6 +523,7 @@ function updateUserProfile(userId, { fullName, email }) {
   saveCurrentUser(toSessionUser(updatedUser));
   syncBookingsForUser(userId, updatedUser);
   syncComboOrdersForUser(userId, updatedUser);
+  syncSupportRequestsForUser(userId, updatedUser);
   syncLastCustomerInfo(currentUserRecord.email, updatedUser);
 
   return {

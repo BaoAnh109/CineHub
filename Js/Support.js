@@ -1,6 +1,11 @@
-const SUPPORT_REQUESTS_KEY = "cinehub_support_requests";
+﻿document.addEventListener("DOMContentLoaded", () => {
+  const currentUser = getCurrentUser();
 
-document.addEventListener("DOMContentLoaded", () => {
+  if (!currentUser) {
+    window.location.href = `${buildAuthPageUrl("login", "Support.html")}&reason=support`;
+    return;
+  }
+
   const supportForm = document.getElementById("support-form");
   const requestList = document.getElementById("support-request-list");
   const fullNameInput = document.getElementById("support-full-name");
@@ -61,9 +66,10 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const requests = getSupportRequests();
-    requests.unshift({
+    addSupportRequest({
       requestCode: generateSupportRequestCode(),
+      ownerId: currentUser.id,
+      ownerEmail: currentUser.email,
       fullName,
       email,
       phone,
@@ -71,10 +77,11 @@ document.addEventListener("DOMContentLoaded", () => {
       subject,
       message,
       status: "Mới tiếp nhận",
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      resolvedAt: null,
+      resolvedBy: null
     });
 
-    saveSupportRequests(requests.slice(0, 30));
     renderRequests();
 
     supportForm.reset();
@@ -86,7 +93,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   function preloadUserInfo() {
-    const currentUser = getCurrentUser();
     const lastCustomer = getLastCustomerInfo();
 
     fullNameInput.value = currentUser?.fullName || lastCustomer?.customerName || "";
@@ -95,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderRequests() {
-    const requests = getSupportRequests();
+    const requests = getSupportRequestsByUser(currentUser);
 
     if (requests.length === 0) {
       requestList.innerHTML = `
@@ -114,12 +120,19 @@ document.addEventListener("DOMContentLoaded", () => {
           <article class="support-request-item">
             <div class="support-request-head">
               <strong>${escapeHtml(request.requestCode)}</strong>
-              <span class="badge-soft">${escapeHtml(request.status)}</span>
+              <span class="badge-soft">${escapeHtml(request.status || "Mới tiếp nhận")}</span>
             </div>
             <div class="summary-list">
               <div class="summary-item"><span>Chủ đề</span><strong>${escapeHtml(request.subject)}</strong></div>
               <div class="summary-item"><span>Mã vé</span><strong>${escapeHtml(request.ticketCode || "Không có")}</strong></div>
               <div class="summary-item"><span>Thời gian gửi</span><strong>${escapeHtml(formatDateTime(request.createdAt))}</strong></div>
+              ${
+                request.resolvedAt
+                  ? `<div class="summary-item"><span>Cập nhật lần cuối</span><strong>${escapeHtml(
+                      formatDateTime(request.resolvedAt)
+                    )}</strong></div>`
+                  : ""
+              }
             </div>
             <p class="mb-0 mt-2">${escapeHtml(request.message)}</p>
           </article>
@@ -128,21 +141,6 @@ document.addEventListener("DOMContentLoaded", () => {
       .join("");
   }
 });
-
-function getSupportRequests() {
-  try {
-    const raw = localStorage.getItem(SUPPORT_REQUESTS_KEY);
-    const parsed = raw ? JSON.parse(raw) : [];
-    return Array.isArray(parsed) ? parsed : [];
-  } catch (error) {
-    console.error("Không thể đọc danh sách hỗ trợ:", error);
-    return [];
-  }
-}
-
-function saveSupportRequests(requests) {
-  localStorage.setItem(SUPPORT_REQUESTS_KEY, JSON.stringify(requests));
-}
 
 function generateSupportRequestCode() {
   const timePart = Date.now().toString().slice(-7);

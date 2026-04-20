@@ -1,4 +1,4 @@
-window.appReady = syncBaseData();
+﻿window.appReady = syncBaseData();
 
 function escapeHtml(value) {
   if (value === null || value === undefined) {
@@ -212,6 +212,9 @@ function renderSiteHeader() {
   const profileLink = currentUser ? "Profile.html" : buildAuthPageUrl("login", "Profile.html");
   const supportLink = "Support.html";
   const combosLink = "Combos.html";
+  const supportNavItem = !isAdmin(currentUser)
+    ? `<li class="nav-item"><a class="nav-link ${activePage === "support" ? "active" : ""}" href="${supportLink}">Hỗ trợ</a></li>`
+    : "";
   const themeToggleHtml = createThemeToggleMarkup(getActiveTheme());
   const authActionHtml = currentUser
     ? `
@@ -253,7 +256,7 @@ function renderSiteHeader() {
             <li class="nav-item"><a class="nav-link ${activePage === "home" ? "active" : ""}" href="Home.html">Trang chủ</a></li>
             <li class="nav-item"><a class="nav-link ${activePage === "movies" ? "active" : ""}" href="Movies.html">Phim</a></li>
             <li class="nav-item"><a class="nav-link ${activePage === "combos" ? "active" : ""}" href="${combosLink}">Combo bắp nước</a></li>
-            <li class="nav-item"><a class="nav-link ${activePage === "support" ? "active" : ""}" href="${supportLink}">Hỗ trợ</a></li>
+            ${supportNavItem}
             <li class="nav-item"><a class="nav-link ${activePage === "tickets" ? "active" : ""}" href="${ticketsLink}">Vé đã đặt</a></li>
             ${isAdmin(currentUser) ? `<li class="nav-item"><a class="nav-link ${activePage === "admin" ? "active" : ""}" href="Admin.html">Quản lý rạp</a></li>` : ""}
           </ul>
@@ -278,8 +281,10 @@ function renderSiteHeader() {
     logoutButton.addEventListener("click", () => {
       logoutUser();
 
-      if (resolvePageKey() === "admin") {
-        window.location.href = buildAuthPageUrl("login", "Admin.html");
+      const protectedPages = new Set(["admin", "profile", "tickets", "support", "combos"]);
+
+      if (protectedPages.has(resolvePageKey())) {
+        window.location.href = `${buildAuthPageUrl("login", getCurrentPagePath())}&reason=auth`;
         return;
       }
 
@@ -299,6 +304,13 @@ function renderSiteFooter() {
   const ticketsLink = currentUser ? "Tickets.html" : buildAuthPageUrl("login", "Tickets.html");
   const supportLink = "Support.html";
   const combosLink = "Combos.html";
+  const supportFooterItem = !isAdmin(currentUser)
+    ? `
+              <li class="mb-2">
+                <a href="${supportLink}" class="footer-link text-decoration-none">Hỗ trợ khách hàng</a>
+              </li>
+    `
+    : "";
 
   footer.innerHTML = `
     <footer class="site-footer">
@@ -330,9 +342,7 @@ function renderSiteFooter() {
               <li class="mb-2">
                 <a href="${ticketsLink}" class="footer-link text-decoration-none">Vé đã đặt</a>
               </li>
-              <li class="mb-2">
-                <a href="${supportLink}" class="footer-link text-decoration-none">Hỗ trợ khách hàng</a>
-              </li>
+              ${supportFooterItem}
               <li class="mb-2">
                 ${
                   isAdmin(currentUser)
@@ -346,37 +356,37 @@ function renderSiteFooter() {
             </ul>
           </div>
           <div class="col-12 col-md-4 text-center text-md-start">
-              <h5 class="footer-title mb-3">Liên hệ</h5>
-              <ul class="list-unstyled mb-0">
-                <li class="mb-2">
-                  <i class="bi bi-geo-alt me-2"></i>
-                  140 Lê Trọng Tấn, Tân Phú, TP.HCM
-                </li>
-                <li class="mb-2">
-                  <i class="bi bi-telephone me-2"></i>
-                  077 999 9999
-                </li>
-                <li class="mb-2">
-                  <i class="bi bi-envelope me-2"></i>
-                  <a href="mailto:anh011009@gmail.com" class="footer-title">anh011009@gmail.com</a>
-                </li>
-                <li class="mb-2">
-                  <i class="bi bi-clock me-2"></i>
-                  Hỗ trợ: 08:00 - 22:00
-                </li>
-                <li>
-                  <a href="https://www.facebook.com/b.hhhna" target="_blank" class="social-link me-2"><i class="bi bi-facebook"></i></a>
-                  <a href="https://www.instagram.com/b.hhhna/" target="_blank" class="social-link me-2"><i class="bi bi-instagram"></i></a>
-                  <a href="https://github.com/BaoAnh109" target="_blank" class="social-link"><i class="bi bi-github"></i></a>
-                </li>
-              </ul>
-            </div>
+            <h5 class="footer-title mb-3">Liên hệ</h5>
+            <ul class="list-unstyled mb-0">
+              <li class="mb-2">
+                <i class="bi bi-geo-alt me-2"></i>
+                140 Lê Trọng Tấn, Tân Phú, TP.HCM
+              </li>
+              <li class="mb-2">
+                <i class="bi bi-telephone me-2"></i>
+                077 999 9999
+              </li>
+              <li class="mb-2">
+                <i class="bi bi-envelope me-2"></i>
+                <a href="mailto:anh011009@gmail.com" class="footer-title">anh011009@gmail.com</a>
+              </li>
+              <li class="mb-2">
+                <i class="bi bi-clock me-2"></i>
+                Hỗ trợ: 08:00 - 22:00
+              </li>
+              <li>
+                <a href="https://www.facebook.com/b.hhhna" target="_blank" class="social-link me-2"><i class="bi bi-facebook"></i></a>
+                <a href="https://www.instagram.com/b.hhhna/" target="_blank" class="social-link me-2"><i class="bi bi-instagram"></i></a>
+                <a href="https://github.com/BaoAnh109" target="_blank" class="social-link"><i class="bi bi-github"></i></a>
+              </li>
+            </ul>
           </div>
         </div>
         <div class="border-top mt-4 pt-3">
-        <div class="row">
-          <div class="col-12 text-center mb-2">
-            <small>© 2025 CineHub. Bảo lưu mọi quyền.</small>
+          <div class="row">
+            <div class="col-12 text-center mb-2">
+              <small>© 2025 CineHub. Bảo lưu mọi quyền.</small>
+            </div>
           </div>
         </div>
       </div>
@@ -411,8 +421,10 @@ async function initHomePage() {
         </div>
 
         <div class="carousel-inner h-100">
-          ${featuredMovies.map((movie, index) => `
-            <div class="carousel-item ${index === 0 ? 'active' : ''} h-100">
+          ${featuredMovies
+            .map(
+              (movie, index) => `
+            <div class="carousel-item ${index === 0 ? "active" : ""} h-100">
               <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-black">
                 <img
                   src="${escapeHtml(getImagePath(movie.banner, "../Assets/Images/Banners/DefaultBanner.svg"))}"
@@ -422,7 +434,9 @@ async function initHomePage() {
                 >
               </div>
             </div>
-          `).join("")}
+          `
+            )
+            .join("")}
         </div>
 
         <button class="carousel-control-prev" type="button" data-bs-target="#carouselMovieHot" data-bs-slide="prev">
@@ -441,9 +455,7 @@ async function initHomePage() {
   homeMovies.innerHTML = movies.slice(0, 6).map(createMovieCard).join("");
 }
 
-
 initializeTheme();
-
 
 document.addEventListener("DOMContentLoaded", async () => {
   renderSiteHeader();

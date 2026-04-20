@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@300;400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <link
@@ -47,6 +47,11 @@
           <li class="nav-item" role="presentation">
             <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tickets-manager" type="button">
               Quản lý vé đặt
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#support-manager" type="button">
+              Quản lý hỗ trợ
             </button>
           </li>
         </ul>
@@ -240,10 +245,54 @@
               </div>
             </div>
           </div>
+
+          <div class="tab-pane fade" id="support-manager">
+            <div class="admin-panel">
+              <h2 class="h4 mb-3">Danh sách yêu cầu hỗ trợ</h2>
+              <div class="table-responsive">
+                <table class="table table-dark align-middle">
+                  <thead>
+                    <tr>
+                      <th>Mã yêu cầu</th>
+                      <th>Khách hàng</th>
+                      <th>Liên hệ</th>
+                      <th>Chủ đề</th>
+                      <th>Mã vé</th>
+                      <th>Trạng thái</th>
+                      <th>Thời gian</th>
+                      <th>Thao tác</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-support-table"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </main>
 
+
+    <div class="modal fade" id="admin-support-modal" tabindex="-1" aria-labelledby="admin-support-modal-title" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content ticket-detail-modal-content">
+          <div class="modal-header border-secondary-subtle">
+            <div>
+              <h2 class="h5 mb-1" id="admin-support-modal-title">Chi tiết yêu cầu hỗ trợ</h2>
+              <p class="mb-0 small ticket-detail-subtitle" id="admin-support-modal-subtitle"></p>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+          </div>
+          <div class="modal-body">
+            <div id="admin-support-modal-info" class="summary-list"></div>
+            <div class="mt-4 d-flex flex-wrap gap-2">
+              <button type="button" class="btn btn-cine-primary" id="admin-support-resolve-btn">Đánh dấu đã xử lý</button>
+              <button type="button" class="btn btn-outline-danger" id="admin-support-cancel-btn">Hủy bỏ yêu cầu</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <div id="site-footer"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

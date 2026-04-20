@@ -15,11 +15,34 @@ document.addEventListener("DOMContentLoaded", async () => {
   const moviesTable = document.getElementById("admin-movies-table");
   const showtimesTable = document.getElementById("admin-showtimes-table");
   const bookingsTable = document.getElementById("admin-bookings-table");
+  const supportTable = document.getElementById("admin-support-table");
   const showtimeMovieSelect = document.getElementById("showtime-movie");
+  const supportModalElement = document.getElementById("admin-support-modal");
+  const supportModalTitle = document.getElementById("admin-support-modal-title");
+  const supportModalSubtitle = document.getElementById("admin-support-modal-subtitle");
+  const supportModalInfo = document.getElementById("admin-support-modal-info");
+  const supportResolveButton = document.getElementById("admin-support-resolve-btn");
+  const supportCancelButton = document.getElementById("admin-support-cancel-btn");
 
-  if (!movieForm || !showtimeForm || !moviesTable || !showtimesTable || !bookingsTable || !showtimeMovieSelect) {
+  if (
+    !movieForm ||
+    !showtimeForm ||
+    !moviesTable ||
+    !showtimesTable ||
+    !bookingsTable ||
+    !supportTable ||
+    !showtimeMovieSelect ||
+    !supportModalElement ||
+    !supportModalTitle ||
+    !supportModalSubtitle ||
+    !supportModalInfo ||
+    !supportResolveButton ||
+    !supportCancelButton
+  ) {
     return;
   }
+
+  const supportModal = bootstrap.Modal.getOrCreateInstance(supportModalElement);
 
   const posterField = setupImageDropzone({
     hiddenInput: document.getElementById("movie-poster"),
@@ -45,11 +68,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   let movies = [];
   let showtimes = [];
+  let supportRequests = [];
+  let activeSupportRequestCode = null;
 
   try {
     await window.appReady;
     movies = await getMovies();
     showtimes = await getShowtimes();
+    supportRequests = getSupportRequests();
     renderAll();
   } catch (error) {
     console.error(error);
@@ -63,12 +89,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("reset-showtime-form-btn").addEventListener("click", resetShowtimeForm);
   moviesTable.addEventListener("click", handleMovieActions);
   showtimesTable.addEventListener("click", handleShowtimeActions);
+  supportTable.addEventListener("click", handleSupportActions);
+  supportResolveButton.addEventListener("click", () => updateSupportRequest("Đã xử lý"));
+  supportCancelButton.addEventListener("click", () => updateSupportRequest("Đã hủy bỏ"));
 
   function renderAll() {
     renderMovieOptions();
     renderMoviesTable();
     renderShowtimesTable();
     renderBookingsTable();
+    renderSupportRequestsTable();
   }
 
   function renderMovieOptions() {
@@ -159,6 +189,43 @@ document.addEventListener("DOMContentLoaded", async () => {
           </tr>
         `
       )
+      .join("");
+  }
+
+  function renderSupportRequestsTable() {
+    supportRequests = getSupportRequests();
+
+    if (supportRequests.length === 0) {
+      supportTable.innerHTML = `<tr><td colspan="8" class="text-center text-light-emphasis">Chưa có yêu cầu hỗ trợ nào.</td></tr>`;
+      return;
+    }
+
+    supportTable.innerHTML = supportRequests
+      .map((request) => {
+        const status = request.status || "Mới tiếp nhận";
+        const canResolve = status === "Mới tiếp nhận";
+        const canCancel = status === "Mới tiếp nhận";
+        const contact = [request.phone, request.email].filter(Boolean).join(" - ");
+
+        return `
+          <tr>
+            <td><strong>${escapeHtml(request.requestCode)}</strong></td>
+            <td>${escapeHtml(request.fullName || "Không có")}</td>
+            <td>${escapeHtml(contact || "Không có")}</td>
+            <td>${escapeHtml(request.subject || "Không có")}</td>
+            <td>${escapeHtml(request.ticketCode || "Không có")}</td>
+            <td><span class="badge-soft">${escapeHtml(status)}</span></td>
+            <td>${escapeHtml(formatDateTime(request.createdAt))}</td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn btn-sm btn-cine-outline view-support-btn" data-request-code="${escapeHtml(request.requestCode)}">Xem</button>
+                <button class="btn btn-sm btn-success resolve-support-btn" data-request-code="${escapeHtml(request.requestCode)}" ${canResolve ? "" : "disabled"}>Đã xử lý</button>
+                <button class="btn btn-sm btn-outline-danger cancel-support-btn" data-request-code="${escapeHtml(request.requestCode)}" ${canCancel ? "" : "disabled"}>Hủy bỏ</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      })
       .join("");
   }
 
@@ -317,6 +384,101 @@ document.addEventListener("DOMContentLoaded", async () => {
       renderAll();
       showAlert("admin-alert", "Đã xóa lịch chiếu.", "success");
     }
+  }
+
+  function handleSupportActions(event) {
+    const viewButton = event.target.closest(".view-support-btn");
+    const resolveButton = event.target.closest(".resolve-support-btn");
+    const cancelButton = event.target.closest(".cancel-support-btn");
+
+    if (viewButton) {
+      openSupportDetailModal(viewButton.dataset.requestCode);
+      return;
+    }
+
+    if (resolveButton) {
+      activeSupportRequestCode = resolveButton.dataset.requestCode;
+      updateSupportRequest("Đã xử lý");
+      return;
+    }
+
+    if (cancelButton) {
+      activeSupportRequestCode = cancelButton.dataset.requestCode;
+      updateSupportRequest("Đã hủy bỏ");
+    }
+  }
+
+  function openSupportDetailModal(requestCode) {
+    const request = supportRequests.find((item) => item.requestCode === requestCode);
+
+    if (!request) {
+      showAlert("admin-alert", "Không tìm thấy yêu cầu hỗ trợ.", "danger");
+      return;
+    }
+
+    activeSupportRequestCode = request.requestCode;
+    const status = request.status || "Mới tiếp nhận";
+    const resolvedBy = request.resolvedBy?.fullName || request.resolvedBy?.email || "";
+
+    supportModalTitle.textContent = `Yêu cầu: ${request.requestCode}`;
+    supportModalSubtitle.textContent = `${request.fullName || "Khách hàng"} - ${status}`;
+    supportModalInfo.innerHTML = `
+      <div class="summary-item"><span>Khách hàng</span><strong>${escapeHtml(request.fullName || "Không có")}</strong></div>
+      <div class="summary-item"><span>Email</span><strong>${escapeHtml(request.email || "Không có")}</strong></div>
+      <div class="summary-item"><span>Số điện thoại</span><strong>${escapeHtml(request.phone || "Không có")}</strong></div>
+      <div class="summary-item"><span>Chủ đề</span><strong>${escapeHtml(request.subject || "Không có")}</strong></div>
+      <div class="summary-item"><span>Mã vé</span><strong>${escapeHtml(request.ticketCode || "Không có")}</strong></div>
+      <div class="summary-item"><span>Trạng thái</span><strong>${escapeHtml(status)}</strong></div>
+      <div class="summary-item"><span>Thời gian gửi</span><strong>${escapeHtml(formatDateTime(request.createdAt))}</strong></div>
+      ${
+        request.resolvedAt
+          ? `<div class="summary-item"><span>Thời gian cập nhật</span><strong>${escapeHtml(
+              formatDateTime(request.resolvedAt)
+            )}</strong></div>`
+          : ""
+      }
+      ${
+        resolvedBy
+          ? `<div class="summary-item"><span>Người xử lý</span><strong>${escapeHtml(resolvedBy)}</strong></div>`
+          : ""
+      }
+      <div class="summary-item"><span>Nội dung</span><strong class="text-break">${escapeHtml(request.message || "Không có")}</strong></div>
+    `;
+
+    const isPending = status === "Mới tiếp nhận";
+    supportResolveButton.disabled = !isPending;
+    supportCancelButton.disabled = !isPending;
+    supportModal.show();
+  }
+
+  function updateSupportRequest(nextStatus) {
+    if (!activeSupportRequestCode) {
+      return;
+    }
+
+    const request = supportRequests.find((item) => item.requestCode === activeSupportRequestCode);
+
+    if (!request) {
+      showAlert("admin-alert", "Không tìm thấy yêu cầu hỗ trợ để cập nhật.", "danger");
+      return;
+    }
+
+    if ((request.status || "Mới tiếp nhận") !== "Mới tiếp nhận") {
+      showAlert("admin-alert", "Yêu cầu này đã được xử lý trước đó.", "warning");
+      return;
+    }
+
+    const updated = updateSupportRequestStatus(activeSupportRequestCode, nextStatus, currentUser);
+
+    if (!updated) {
+      showAlert("admin-alert", "Không thể cập nhật trạng thái yêu cầu hỗ trợ.", "danger");
+      return;
+    }
+
+    supportRequests = getSupportRequests();
+    renderSupportRequestsTable();
+    openSupportDetailModal(activeSupportRequestCode);
+    showAlert("admin-alert", `Đã cập nhật yêu cầu ${activeSupportRequestCode} thành trạng thái "${nextStatus}".`, "success");
   }
 
   function resetMovieForm() {
