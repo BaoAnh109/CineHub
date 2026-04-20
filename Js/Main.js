@@ -210,6 +210,7 @@ function renderSiteHeader() {
   const currentUser = getCurrentUser();
   const ticketsLink = currentUser ? "Tickets.html" : buildAuthPageUrl("login", "Tickets.html");
   const profileLink = currentUser ? "Profile.html" : buildAuthPageUrl("login", "Profile.html");
+  const supportLink = "Support.html";
   const themeToggleHtml = createThemeToggleMarkup(getActiveTheme());
   const authActionHtml = currentUser
     ? `
@@ -250,6 +251,7 @@ function renderSiteHeader() {
           <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
             <li class="nav-item"><a class="nav-link ${activePage === "home" ? "active" : ""}" href="Home.html">Trang chủ</a></li>
             <li class="nav-item"><a class="nav-link ${activePage === "movies" ? "active" : ""}" href="Movies.html">Phim</a></li>
+            <li class="nav-item"><a class="nav-link ${activePage === "support" ? "active" : ""}" href="${supportLink}">Hỗ trợ</a></li>
             <li class="nav-item"><a class="nav-link ${activePage === "tickets" ? "active" : ""}" href="${ticketsLink}">Vé đã đặt</a></li>
             ${isAdmin(currentUser) ? `<li class="nav-item"><a class="nav-link ${activePage === "admin" ? "active" : ""}" href="Admin.html">Quản lý rạp</a></li>` : ""}
           </ul>
@@ -293,6 +295,7 @@ function renderSiteFooter() {
 
   const currentUser = getCurrentUser();
   const ticketsLink = currentUser ? "Tickets.html" : buildAuthPageUrl("login", "Tickets.html");
+  const supportLink = "Support.html";
 
   footer.innerHTML = `
     <footer class="site-footer">
@@ -320,6 +323,9 @@ function renderSiteFooter() {
               </li>
               <li class="mb-2">
                 <a href="${ticketsLink}" class="footer-link text-decoration-none">Vé đã đặt</a>
+              </li>
+              <li class="mb-2">
+                <a href="${supportLink}" class="footer-link text-decoration-none">Hỗ trợ khách hàng</a>
               </li>
               <li class="mb-2">
                 ${

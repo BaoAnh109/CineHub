@@ -107,7 +107,7 @@ body[data-theme="light"] {
 
 body {
   margin: 0;
-  font-family: "Poppins", sans-serif;
+  font-family: "Roboto", sans-serif;
   color: var(--text-main);
   background: var(--page-bg);
   min-height: 100vh;
@@ -245,8 +245,9 @@ img {
 .page-title-block h1,
 .hero-content h1,
 .movie-detail-banner h1 {
-  font-family: "Bebas Neue", sans-serif;
-  letter-spacing: 1px;
+  font-family: "Poppins", "Roboto", sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.4px;
 }
 
 .section-heading h2,
@@ -802,6 +803,75 @@ img {
 
 body[data-theme="dark"] .ticket-detail-modal-content .btn-close {
   filter: invert(1) grayscale(1);
+}
+
+.support-info-panel,
+.support-history-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  padding: 1.7rem;
+}
+
+.support-contact-list {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.support-contact-item {
+  display: flex;
+  gap: 0.8rem;
+  align-items: flex-start;
+  padding: 0.85rem 1rem;
+  border-radius: 16px;
+  background: var(--surface-soft);
+  border: 1px solid var(--border-soft);
+}
+
+.support-contact-item i {
+  color: var(--gold);
+  font-size: 1.1rem;
+  margin-top: 0.15rem;
+}
+
+.support-contact-item span {
+  display: block;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.support-contact-item strong {
+  color: var(--text-main);
+}
+
+.support-tip-list {
+  margin: 0;
+  padding-left: 1.1rem;
+  color: var(--text-muted);
+}
+
+.support-tip-list li + li {
+  margin-top: 0.35rem;
+}
+
+.support-request-item {
+  padding: 1rem 1.1rem;
+  border-radius: 18px;
+  border: 1px solid var(--border-soft);
+  background: var(--surface-soft);
+}
+
+.support-request-item + .support-request-item {
+  margin-top: 0.85rem;
+}
+
+.support-request-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.8rem;
+  align-items: center;
+  margin-bottom: 0.65rem;
 }
 
 .table-dark {
